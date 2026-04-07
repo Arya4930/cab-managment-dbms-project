@@ -2,7 +2,14 @@ import express from "express";
 import oracledb from "oracledb";
 import getConnection from "../../oracle.js";
 import {
+  bookingDeleteDependencySql,
   bookingSelectSql,
+  deleteBookingSql,
+  insertBookingSql,
+  nextBookingIdSql,
+  updateBookingSql,
+} from "../../db/queries/bookings.js";
+import {
   closeConnection,
   fetchRows,
   normalizeBookingId,
@@ -32,40 +39,14 @@ router.post("/bookings", async (req, res) => {
     conn = await getConnection();
 
     const bookingIdResult = await conn.execute(
-      `SELECT 'BK-' || LPAD(bookings_seq.NEXTVAL, 3, '0') AS booking_id FROM dual`,
+      nextBookingIdSql,
       [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
     const bookingId = bookingIdResult.rows[0].BOOKING_ID;
 
-    await conn.execute(
-      `
-        INSERT INTO bookings (
-          booking_id,
-          pickup_loc,
-          dropoff_loc,
-          pickup_time,
-          fare,
-          status,
-          user_id,
-          driver_id,
-          cab_id,
-          distance_km
-        ) VALUES (
-          :booking_id,
-          :pickup,
-          :dropoff,
-          :pickup_time,
-          :fare,
-          :status,
-          :user_id,
-          :driver_id,
-          :cab_id,
-          :distance_km
-        )
-      `,
-      {
+    await conn.execute(insertBookingSql, {
         booking_id: bookingId,
         pickup: req.body.pickup,
         dropoff: req.body.dropoff,
@@ -76,9 +57,7 @@ router.post("/bookings", async (req, res) => {
         driver_id: Number(req.body.driver_id),
         cab_id: Number(req.body.cab_id),
         distance_km: Number(req.body.distance_km ?? 0),
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     const rows = await fetchRows(conn, bookingSelectSql, { booking_id: bookingId });
     return res.status(201).json({ message: "Booking created", booking: rows[0] });
@@ -117,21 +96,7 @@ router.put("/bookings/:bookingId", async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    await conn.execute(
-      `
-        UPDATE bookings
-        SET pickup_loc = :pickup,
-            dropoff_loc = :dropoff,
-            pickup_time = :pickup_time,
-            fare = :fare,
-            status = :status,
-            user_id = :user_id,
-            driver_id = :driver_id,
-            cab_id = :cab_id,
-            distance_km = :distance_km
-        WHERE UPPER(TRIM(booking_id)) = :booking_id
-      `,
-      {
+    await conn.execute(updateBookingSql, {
         booking_id: bookingId,
         pickup: req.body.pickup,
         dropoff: req.body.dropoff,
@@ -142,9 +107,7 @@ router.put("/bookings/:bookingId", async (req, res) => {
         driver_id: Number(req.body.driver_id),
         cab_id: Number(req.body.cab_id),
         distance_km: Number(req.body.distance_km ?? 0),
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     const rows = await fetchRows(conn, bookingSelectSql, { booking_id: bookingId });
     return res.status(200).json({ message: "Booking updated", booking: rows[0] });
@@ -168,14 +131,14 @@ router.delete("/bookings/:bookingId", async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    await conn.execute(`DELETE FROM ride_tracking WHERE UPPER(TRIM(booking_id)) = :booking_id`, { booking_id: bookingId });
-    await conn.execute(`DELETE FROM ratings_reviews WHERE UPPER(TRIM(booking_id)) = :booking_id`, { booking_id: bookingId });
-    await conn.execute(`DELETE FROM payment WHERE UPPER(TRIM(booking_id)) = :booking_id`, { booking_id: bookingId });
-    await conn.execute(`DELETE FROM earnings WHERE UPPER(TRIM(booking_id)) = :booking_id`, { booking_id: bookingId });
-    await conn.execute(`DELETE FROM refunds WHERE UPPER(TRIM(booking_id)) = :booking_id`, { booking_id: bookingId });
+    await conn.execute(bookingDeleteDependencySql.tracking, { booking_id: bookingId });
+    await conn.execute(bookingDeleteDependencySql.ratings, { booking_id: bookingId });
+    await conn.execute(bookingDeleteDependencySql.payments, { booking_id: bookingId });
+    await conn.execute(bookingDeleteDependencySql.earnings, { booking_id: bookingId });
+    await conn.execute(bookingDeleteDependencySql.refunds, { booking_id: bookingId });
 
     const result = await conn.execute(
-      `DELETE FROM bookings WHERE UPPER(TRIM(booking_id)) = :booking_id`,
+      deleteBookingSql,
       { booking_id: bookingId },
       { autoCommit: true }
     );

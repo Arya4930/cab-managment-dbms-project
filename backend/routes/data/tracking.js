@@ -1,21 +1,15 @@
 import express from "express";
 import oracledb from "oracledb";
 import getConnection from "../../oracle.js";
+import {
+  deleteTrackingSql,
+  insertTrackingSql,
+  trackingSelectSql,
+  updateTrackingSql,
+} from "../../db/queries/tracking.js";
 import { closeConnection, fetchRows, validateRequired } from "./helpers.js";
 
 const router = express.Router();
-
-const trackingSelectSql = `
-  SELECT
-    tracking_id AS "track_id",
-    driver_location AS "driver_location",
-    TO_CHAR(time_stamp, 'YYYY-MM-DD HH24:MI') AS "timestamp",
-    booking_id AS "booking_id",
-    speed_kmh AS "speed_kmh",
-    track_status AS "status"
-  FROM ride_tracking
-  WHERE tracking_id = :tracking_id
-`;
 
 router.post("/tracking", async (req, res) => {
   const missing = validateRequired(req.body, ["booking_id", "driver_location"]);
@@ -28,24 +22,7 @@ router.post("/tracking", async (req, res) => {
   try {
     conn = await getConnection();
 
-    const result = await conn.execute(
-      `
-        INSERT INTO ride_tracking (
-          driver_location,
-          time_stamp,
-          booking_id,
-          speed_kmh,
-          track_status
-        ) VALUES (
-          :driver_location,
-          :time_stamp,
-          :booking_id,
-          :speed_kmh,
-          :track_status
-        )
-        RETURNING tracking_id INTO :tracking_id
-      `,
-      {
+    const result = await conn.execute(insertTrackingSql, {
         driver_location: req.body.driver_location,
         time_stamp: req.body.timestamp ? new Date(req.body.timestamp) : new Date(),
         booking_id: String(req.body.booking_id).trim().toUpperCase(),
@@ -54,9 +31,7 @@ router.post("/tracking", async (req, res) => {
           : Number(req.body.speed_kmh),
         track_status: req.body.status ?? "En Route",
         tracking_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     const trackingId = result.outBinds.tracking_id[0];
     const rows = await fetchRows(conn, trackingSelectSql, { tracking_id: trackingId });
@@ -90,17 +65,7 @@ router.put("/tracking/:trackingId", async (req, res) => {
       return res.status(404).json({ message: "Tracking event not found" });
     }
 
-    await conn.execute(
-      `
-        UPDATE ride_tracking
-        SET driver_location = :driver_location,
-            time_stamp = :time_stamp,
-            booking_id = :booking_id,
-            speed_kmh = :speed_kmh,
-            track_status = :track_status
-        WHERE tracking_id = :tracking_id
-      `,
-      {
+    await conn.execute(updateTrackingSql, {
         tracking_id: trackingId,
         driver_location: req.body.driver_location,
         time_stamp: req.body.timestamp ? new Date(req.body.timestamp) : new Date(),
@@ -109,9 +74,7 @@ router.put("/tracking/:trackingId", async (req, res) => {
           ? null
           : Number(req.body.speed_kmh),
         track_status: req.body.status,
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     const rows = await fetchRows(conn, trackingSelectSql, { tracking_id: trackingId });
     return res.status(200).json({ message: "Tracking event updated", tracking: rows[0] });
@@ -134,11 +97,7 @@ router.delete("/tracking/:trackingId", async (req, res) => {
   try {
     conn = await getConnection();
 
-    const result = await conn.execute(
-      `DELETE FROM ride_tracking WHERE tracking_id = :tracking_id`,
-      { tracking_id: trackingId },
-      { autoCommit: true }
-    );
+    const result = await conn.execute(deleteTrackingSql, { tracking_id: trackingId }, { autoCommit: true });
 
     if (result.rowsAffected === 0) {
       return res.status(404).json({ message: "Tracking event not found" });

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, Mail, ShieldCheck, Zap } from "lucide-react";
 
 const API_BASE = "http://localhost:3000/api";
@@ -117,6 +117,10 @@ export default function Login({ currentAdmin, onLogin }) {
 
         <div className="login-note">
           Dev fallback email: <span className="mono">{FALLBACK_ADMIN.email}</span>
+        </div>
+        <div className="portal-loginLinks" style={{ marginTop: "16px" }}>
+          <Link to="/passenger/login">Passenger login</Link>
+          <Link to="/driver/login">Driver login</Link>
         </div>
       </div>
     </div>

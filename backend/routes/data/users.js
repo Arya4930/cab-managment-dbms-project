@@ -1,5 +1,16 @@
 import express from "express";
 import getConnection from "../../oracle.js";
+import {
+  deleteUserSql,
+  findUserDeleteUsageSql,
+  insertUserSql,
+  nextUserIdSql,
+  selectUserByEmailSql,
+  selectUserByIdSql,
+  selectUserEmailConflictSql,
+  selectUserExistsSql,
+  updateUserSql,
+} from "../../db/queries/users.js";
 import { closeConnection, fetchRows, syncDriverRecordFromUser, validateRequired } from "./helpers.js";
 
 const router = express.Router();
@@ -15,47 +26,16 @@ router.post("/users", async (req, res) => {
   try {
     conn = await getConnection();
 
-    const existing = await fetchRows(
-      conn,
-      `
-        SELECT user_id AS "user_id"
-        FROM users
-        WHERE LOWER(email) = LOWER(:email)
-      `,
-      { email: req.body.email }
-    );
+    const existing = await fetchRows(conn, selectUserByEmailSql, { email: req.body.email });
 
     if (existing.length > 0) {
       return res.status(409).json({ message: "A passenger with this email already exists" });
     }
 
-    const nextUserIdRows = await fetchRows(
-      conn,
-      `SELECT NVL(MAX(user_id), 0) + 1 AS "next_user_id" FROM users`
-    );
+    const nextUserIdRows = await fetchRows(conn, nextUserIdSql);
     const nextUserId = nextUserIdRows[0]?.next_user_id ?? 1;
 
-    await conn.execute(
-      `
-        INSERT INTO users (
-          user_id,
-          name,
-          email,
-          phone_number,
-          user_type,
-          joined_date,
-          total_rides
-        ) VALUES (
-          :user_id,
-          :name,
-          :email,
-          :phone_number,
-          :user_type,
-          :joined_date,
-          :total_rides
-        )
-      `,
-      {
+    await conn.execute(insertUserSql, {
         user_id: nextUserId,
         name: req.body.name,
         email: req.body.email,
@@ -63,9 +43,7 @@ router.post("/users", async (req, res) => {
         user_type: req.body.user_type ?? "Passenger",
         joined_date: req.body.joined_date ? new Date(req.body.joined_date) : new Date(),
         total_rides: Number(req.body.total_rides ?? 0),
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     await syncDriverRecordFromUser(conn, {
       user_id: nextUserId,
@@ -75,22 +53,7 @@ router.post("/users", async (req, res) => {
       user_type: req.body.user_type ?? "Passenger",
     });
 
-    const rows = await fetchRows(
-      conn,
-      `
-        SELECT
-          user_id AS "user_id",
-          name AS "name",
-          email AS "email",
-          phone_number AS "phone",
-          user_type AS "user_type",
-          TO_CHAR(joined_date, 'YYYY-MM-DD') AS "joined",
-          total_rides AS "total_rides"
-        FROM users
-        WHERE user_id = :user_id
-      `,
-      { user_id: nextUserId }
-    );
+    const rows = await fetchRows(conn, selectUserByIdSql, { user_id: nextUserId });
 
     return res.status(201).json({ message: "Passenger created", user: rows[0] });
   } catch (error) {
@@ -120,43 +83,22 @@ router.put("/users/:userId", async (req, res) => {
   try {
     conn = await getConnection();
 
-    const userRows = await fetchRows(
-      conn,
-      `SELECT user_id AS "user_id" FROM users WHERE user_id = :user_id`,
-      { user_id: userId }
-    );
+    const userRows = await fetchRows(conn, selectUserExistsSql, { user_id: userId });
 
     if (userRows.length === 0) {
       return res.status(404).json({ message: "Passenger not found" });
     }
 
-    const emailRows = await fetchRows(
-      conn,
-      `
-        SELECT user_id AS "user_id"
-        FROM users
-        WHERE LOWER(email) = LOWER(:email)
-          AND user_id <> :user_id
-      `,
-      { email: req.body.email, user_id: userId }
-    );
+    const emailRows = await fetchRows(conn, selectUserEmailConflictSql, {
+      email: req.body.email,
+      user_id: userId,
+    });
 
     if (emailRows.length > 0) {
       return res.status(409).json({ message: "A passenger with this email already exists" });
     }
 
-    await conn.execute(
-      `
-        UPDATE users
-        SET name = :name,
-            email = :email,
-            phone_number = :phone_number,
-            user_type = :user_type,
-            joined_date = :joined_date,
-            total_rides = :total_rides
-        WHERE user_id = :user_id
-      `,
-      {
+    await conn.execute(updateUserSql, {
         user_id: userId,
         name: req.body.name,
         email: req.body.email,
@@ -164,9 +106,7 @@ router.put("/users/:userId", async (req, res) => {
         user_type: req.body.user_type ?? "Passenger",
         joined_date: req.body.joined_date ? new Date(req.body.joined_date) : new Date(),
         total_rides: Number(req.body.total_rides ?? 0),
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     await syncDriverRecordFromUser(conn, {
       user_id: userId,
@@ -176,22 +116,7 @@ router.put("/users/:userId", async (req, res) => {
       user_type: req.body.user_type ?? "Passenger",
     });
 
-    const rows = await fetchRows(
-      conn,
-      `
-        SELECT
-          user_id AS "user_id",
-          name AS "name",
-          email AS "email",
-          phone_number AS "phone",
-          user_type AS "user_type",
-          TO_CHAR(joined_date, 'YYYY-MM-DD') AS "joined",
-          total_rides AS "total_rides"
-        FROM users
-        WHERE user_id = :user_id
-      `,
-      { user_id: userId }
-    );
+    const rows = await fetchRows(conn, selectUserByIdSql, { user_id: userId });
 
     return res.status(200).json({ message: "Passenger updated", user: rows[0] });
   } catch (error) {
@@ -216,26 +141,7 @@ router.delete("/users/:userId", async (req, res) => {
   try {
     conn = await getConnection();
 
-    const usageRows = await fetchRows(
-      conn,
-      `
-        SELECT source_table AS "source_table" FROM (
-          SELECT 'BOOKINGS' AS source_table FROM bookings WHERE user_id = :user_id
-          UNION ALL
-          SELECT 'DRIVERS' AS source_table FROM drivers WHERE user_id = :user_id
-          UNION ALL
-          SELECT 'FEEDBACK' AS source_table FROM feedback WHERE user_id = :user_id
-          UNION ALL
-          SELECT 'SAVED_LOCATION' AS source_table FROM saved_location WHERE user_id = :user_id
-          UNION ALL
-          SELECT 'REFUNDS' AS source_table FROM refunds WHERE user_id = :user_id
-          UNION ALL
-          SELECT 'RATINGS_REVIEWS' AS source_table FROM ratings_reviews WHERE user_id = :user_id
-        )
-        FETCH FIRST 1 ROWS ONLY
-      `,
-      { user_id: userId }
-    );
+    const usageRows = await fetchRows(conn, findUserDeleteUsageSql, { user_id: userId });
 
     if (usageRows.length > 0) {
       return res.status(409).json({
@@ -243,11 +149,7 @@ router.delete("/users/:userId", async (req, res) => {
       });
     }
 
-    const result = await conn.execute(
-      `DELETE FROM users WHERE user_id = :user_id`,
-      { user_id: userId },
-      { autoCommit: true }
-    );
+    const result = await conn.execute(deleteUserSql, { user_id: userId }, { autoCommit: true });
 
     if (result.rowsAffected === 0) {
       return res.status(404).json({ message: "Passenger not found" });

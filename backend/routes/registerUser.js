@@ -1,6 +1,7 @@
 import express from "express";
 import getConnection from "../oracle.js";
 import oracledb from "oracledb";
+import { registerUserSql } from "../db/queries/registerUser.js";
 
 const router = express.Router();
 
@@ -18,9 +19,7 @@ router.post("/register", async (req, res) => {
         conn = await getConnection();
 
         const result = await conn.execute(
-            `INSERT INTO USERS (Name, Email, Phone_Number, User_Type)
-             VALUES (:name, :email, :phone, :user_type)
-             RETURNING User_ID INTO :id`,
+            registerUserSql,
             {
                 name,
                 email,

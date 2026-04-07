@@ -1,24 +1,15 @@
 import express from "express";
 import oracledb from "oracledb";
 import getConnection from "../../oracle.js";
+import {
+  deleteEarningSql,
+  earningsSelectSql,
+  insertEarningSql,
+  updateEarningSql,
+} from "../../db/queries/earnings.js";
 import { closeConnection, fetchRows, validateRequired } from "./helpers.js";
 
 const router = express.Router();
-
-const earningsSelectSql = `
-  SELECT
-    earning_id AS "earnings_id",
-    TO_CHAR(earning_date, 'YYYY-MM-DD') AS "earning_date",
-    TO_CHAR(earning_date, 'Month YYYY') AS "period",
-    driver_amount AS "gross",
-    platform_fee AS "platform_fee",
-    (driver_amount - platform_fee) AS "net",
-    booking_id AS "booking_id",
-    driver_id AS "driver_id",
-    trips AS "trips"
-  FROM earnings
-  WHERE earning_id = :earning_id
-`;
 
 router.post("/earnings", async (req, res) => {
   const missing = validateRequired(req.body, ["booking_id", "driver_id", "gross"]);
@@ -31,26 +22,7 @@ router.post("/earnings", async (req, res) => {
   try {
     conn = await getConnection();
 
-    const result = await conn.execute(
-      `
-        INSERT INTO earnings (
-          earning_date,
-          driver_amount,
-          booking_id,
-          driver_id,
-          platform_fee,
-          trips
-        ) VALUES (
-          :earning_date,
-          :driver_amount,
-          :booking_id,
-          :driver_id,
-          :platform_fee,
-          :trips
-        )
-        RETURNING earning_id INTO :earning_id
-      `,
-      {
+    const result = await conn.execute(insertEarningSql, {
         earning_date: req.body.earning_date ? new Date(req.body.earning_date) : new Date(),
         driver_amount: Number(req.body.gross),
         booking_id: String(req.body.booking_id).trim().toUpperCase(),
@@ -58,9 +30,7 @@ router.post("/earnings", async (req, res) => {
         platform_fee: Number(req.body.platform_fee ?? 0),
         trips: Number(req.body.trips ?? 1),
         earning_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     const earningId = result.outBinds.earning_id[0];
     const rows = await fetchRows(conn, earningsSelectSql, { earning_id: earningId });
@@ -94,18 +64,7 @@ router.put("/earnings/:earningId", async (req, res) => {
       return res.status(404).json({ message: "Earning record not found" });
     }
 
-    await conn.execute(
-      `
-        UPDATE earnings
-        SET earning_date = :earning_date,
-            driver_amount = :driver_amount,
-            booking_id = :booking_id,
-            driver_id = :driver_id,
-            platform_fee = :platform_fee,
-            trips = :trips
-        WHERE earning_id = :earning_id
-      `,
-      {
+    await conn.execute(updateEarningSql, {
         earning_id: earningId,
         earning_date: req.body.earning_date ? new Date(req.body.earning_date) : new Date(),
         driver_amount: Number(req.body.gross),
@@ -113,9 +72,7 @@ router.put("/earnings/:earningId", async (req, res) => {
         driver_id: Number(req.body.driver_id),
         platform_fee: Number(req.body.platform_fee ?? 0),
         trips: Number(req.body.trips ?? 1),
-      },
-      { autoCommit: true }
-    );
+      }, { autoCommit: true });
 
     const rows = await fetchRows(conn, earningsSelectSql, { earning_id: earningId });
     return res.status(200).json({ message: "Earning record updated", earning: rows[0] });
@@ -138,11 +95,7 @@ router.delete("/earnings/:earningId", async (req, res) => {
   try {
     conn = await getConnection();
 
-    const result = await conn.execute(
-      `DELETE FROM earnings WHERE earning_id = :earning_id`,
-      { earning_id: earningId },
-      { autoCommit: true }
-    );
+    const result = await conn.execute(deleteEarningSql, { earning_id: earningId }, { autoCommit: true });
 
     if (result.rowsAffected === 0) {
       return res.status(404).json({ message: "Earning record not found" });

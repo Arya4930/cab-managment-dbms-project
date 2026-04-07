@@ -5,11 +5,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const USERS = [
-  { user_id: 1, name: "Arjun Mehta", email: "arjun@example.com", phone: "+91-98001-11234", joined: "2023-01-15", total_rides: 42 },
-  { user_id: 2, name: "Priya Sharma", email: "priya@example.com", phone: "+91-98001-22345", joined: "2023-03-08", total_rides: 18 },
-  { user_id: 3, name: "Ravi Kumar", email: "ravi@example.com", phone: "+91-98001-33456", joined: "2022-11-20", total_rides: 87 },
-  { user_id: 4, name: "Neha Patel", email: "neha@example.com", phone: "+91-98001-44567", joined: "2024-02-01", total_rides: 5 },
-  { user_id: 5, name: "Suresh Iyer", email: "suresh@example.com", phone: "+91-98001-55678", joined: "2023-07-14", total_rides: 31 },
+  { user_id: 1, name: "Arjun Mehta", email: "arjun@example.com", phone: "+91-98001-11234", user_type: "Passenger", joined: "2023-01-15", total_rides: 42 },
+  { user_id: 2, name: "Priya Sharma", email: "priya@example.com", phone: "+91-98001-22345", user_type: "Passenger", joined: "2023-03-08", total_rides: 18 },
+  { user_id: 3, name: "Ravi Kumar", email: "ravi@example.com", phone: "+91-98001-33456", user_type: "Passenger", joined: "2022-11-20", total_rides: 87 },
+  { user_id: 4, name: "Neha Patel", email: "neha@example.com", phone: "+91-98001-44567", user_type: "Passenger", joined: "2024-02-01", total_rides: 5 },
+  { user_id: 5, name: "Suresh Iyer", email: "suresh@example.com", phone: "+91-98001-55678", user_type: "Passenger", joined: "2023-07-14", total_rides: 31 },
 ];
 
 export const DRIVERS = [
