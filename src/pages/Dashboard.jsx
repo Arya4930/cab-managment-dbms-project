@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
+import useBootstrapData from "../hooks/useBootstrapData";
 import StatCard from "../components/Shared/StatCard";
 import Badge from "../components/Shared/Badge";
 import {
   CalendarCheck, Users, Truck, TrendingUp,
   Star, CreditCard, Activity, Clock,
 } from "lucide-react";
-import {
-  BOOKINGS, DRIVERS, CABS, PAYMENTS, EARNINGS, RATINGS_REVIEWS
-} from "../data/mockData";
 
 // ── Mini bar chart (pure CSS / inline SVG, no external chart lib needed) ──────
 function BarChart({ data, label }) {
@@ -84,18 +81,20 @@ function DonutChart({ segments, title }) {
 }
 
 export default function Dashboard() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(t);
-  }, []);
+  const { data, loading, error } = useBootstrapData();
+  const BOOKINGS = data.bookings ?? [];
+  const DRIVERS = data.drivers ?? [];
+  const CABS = data.cabs ?? [];
+  const PAYMENTS = data.payments ?? [];
+  const EARNINGS = data.earnings ?? [];
+  const RATINGS_REVIEWS = data.ratings_reviews ?? [];
 
   // Derived stats
   const totalRevenue = PAYMENTS.filter((p) => p.status === "Success")
     .reduce((s, p) => s + p.amount, 0);
-  const avgRating =
-    RATINGS_REVIEWS.reduce((s, r) => s + r.rating, 0) / RATINGS_REVIEWS.length;
+  const avgRating = RATINGS_REVIEWS.length
+    ? RATINGS_REVIEWS.reduce((s, r) => s + Number(r.rating), 0) / RATINGS_REVIEWS.length
+    : 0;
   const activeDrivers = DRIVERS.filter((d) => d.status === "Available").length;
   const completedBookings = BOOKINGS.filter((b) => b.status === "Completed").length;
 
@@ -133,6 +132,7 @@ export default function Dashboard() {
         <div>
           <h1 className="page-title">Operations Dashboard</h1>
           <p className="page-sub">Live overview across all 11 data tables · April 2025</p>
+          {error && <p className="page-sub" style={{ color: "var(--accent-amber)" }}>{error}</p>}
         </div>
         <div className="header-badge">
           <Activity size={14} />

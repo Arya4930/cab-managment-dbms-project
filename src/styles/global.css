@@ -309,6 +309,10 @@ html, body, #root {
   cursor: pointer;
 }
 
+.topbar-logout {
+  padding: 8px 14px;
+}
+
 /* ── Page Content ──────────────────────────────────────────────────────────── */
 .page-content {
   flex: 1;
@@ -998,6 +1002,213 @@ html, body, #root {
   border: 1px solid var(--bg-border);
   margin-right: 6px;
   vertical-align: middle;
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.15), transparent 30%),
+    linear-gradient(160deg, #0b0f16 0%, #121826 48%, #0d121b 100%);
+}
+
+.login-panel {
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  border-radius: 24px;
+  background: rgba(19, 22, 30, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.login-brand__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-emerald));
+  color: white;
+}
+
+.login-brand__name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.login-brand__sub {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.login-copy {
+  margin-bottom: 22px;
+}
+
+.login-title {
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.login-subtitle {
+  margin-top: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.login-inputWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--bg-border);
+  color: var(--text-muted);
+}
+
+.login-inputWrap input {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.login-inputWrap input::placeholder {
+  color: var(--text-muted);
+}
+
+.login-error {
+  color: var(--error);
+  font-size: 12px;
+}
+
+.login-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 50px;
+  margin-top: 6px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+.login-submit:hover {
+  transform: translateY(-1px);
+}
+
+.login-submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.login-note {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--bg-border);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.tracking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tracking-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.tracking-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tracking-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tracking-card__sub {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.tracking-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tracking-card__row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 10px;
+  border-top: 1px solid var(--bg-border);
+}
+
+.tracking-card__row span {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tracking-card__row strong {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* Scrollbar styling */

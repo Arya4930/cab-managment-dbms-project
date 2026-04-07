@@ -1,13 +1,12 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { Bell, Search, User } from "lucide-react";
+import { LogOut, Search, User } from "lucide-react";
 
-export default function Layout() {
+export default function Layout({ currentAdmin, onLogout }) {
   return (
     <div className="app-shell">
       <Sidebar />
       <div className="main-area">
-        {/* Top Header Bar */}
         <header className="topbar">
           <div className="topbar-search">
             <Search size={16} className="search-icon" />
@@ -18,18 +17,17 @@ export default function Layout() {
             />
           </div>
           <div className="topbar-actions">
-            <button className="topbar-btn">
-              <Bell size={18} />
-              <span className="notif-badge">3</span>
-            </button>
             <div className="topbar-avatar">
               <User size={16} />
-              <span>Admin</span>
+              <span>{currentAdmin?.name ?? "Admin"}</span>
             </div>
+            <button className="btn btn--ghost topbar-logout" onClick={onLogout}>
+              <LogOut size={15} />
+              Logout
+            </button>
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="page-content">
           <Outlet />
         </main>

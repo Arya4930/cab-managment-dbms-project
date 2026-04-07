@@ -13,6 +13,44 @@ npm run dev
 
 Then open http://localhost:5173
 
+## Backend + Oracle Setup
+
+1. Install backend dependencies:
+
+```bash
+cd backend
+npm install
+```
+
+2. Create backend env file (`backend/.env`) with your Oracle credentials:
+
+```env
+DB_USER=your_oracle_user
+DB_PASSWORD=your_oracle_password
+DB_CONNECT_STRING=localhost:1521/XEPDB1
+FRONTEND_ORIGIN=http://localhost:5173
+```
+
+3. Run SQL scripts in Oracle (SQL Developer / SQL*Plus):
+
+- `backend/db/schema.sql`
+- `backend/db/seed.sql`
+
+4. Start backend server:
+
+```bash
+cd backend
+npm run dev
+```
+
+5. Start frontend (from project root):
+
+```bash
+npm run dev
+```
+
+Frontend calls are proxied from Vite to `http://localhost:3000/api`.
+
 ---
 
 ## File Structure

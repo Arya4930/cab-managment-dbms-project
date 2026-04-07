@@ -14,6 +14,7 @@ import {
 
 const NAV_ITEMS = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", desc: "Overview & KPIs" },
+  { to: "/passengers", icon: Users, label: "Passengers", desc: "Passenger Details" },
   { to: "/bookings", icon: CalendarCheck, label: "Bookings", desc: "Rides & Scheduling" },
   { to: "/fleet", icon: Truck, label: "Fleet", desc: "Cabs & Vehicles" },
   { to: "/drivers", icon: Users, label: "Drivers", desc: "Driver Profiles" },

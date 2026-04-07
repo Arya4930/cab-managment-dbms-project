@@ -51,9 +51,9 @@ export const BOOKINGS = [
 ];
 
 export const RIDE_TRACKING = [
-  { track_id: 1, booking_id: "BK-001", lat: 13.0827, lng: 80.2707, timestamp: "2025-04-01 08:05", speed_kmh: 42, status: "En Route" },
-  { track_id: 2, booking_id: "BK-002", lat: 12.9249, lng: 80.1000, timestamp: "2025-04-02 14:35", speed_kmh: 38, status: "En Route" },
-  { track_id: 3, booking_id: "BK-003", lat: 13.0604, lng: 80.2496, timestamp: "2025-04-03 09:20", speed_kmh: 55, status: "En Route" },
+  { track_id: 1, booking_id: "BK-001", driver_location: "GST Road near Saidapet", timestamp: "2025-04-01 08:05", speed_kmh: 42, status: "En Route" },
+  { track_id: 2, booking_id: "BK-002", driver_location: "Tambaram Flyover", timestamp: "2025-04-02 14:35", speed_kmh: 38, status: "En Route" },
+  { track_id: 3, booking_id: "BK-003", driver_location: "Anna Salai Signal", timestamp: "2025-04-03 09:20", speed_kmh: 55, status: "En Route" },
 ];
 
 export const RATINGS_REVIEWS = [
@@ -71,10 +71,10 @@ export const PAYMENTS = [
 ];
 
 export const EARNINGS = [
-  { earnings_id: 1, driver_id: 101, period: "April 2025", gross: 12400, platform_fee: 1240, net: 11160, trips: 18 },
-  { earnings_id: 2, driver_id: 102, period: "April 2025", gross: 9800, platform_fee: 980, net: 8820, trips: 14 },
-  { earnings_id: 3, driver_id: 103, period: "April 2025", gross: 15200, platform_fee: 1520, net: 13680, trips: 22 },
-  { earnings_id: 4, driver_id: 104, period: "April 2025", gross: 7600, platform_fee: 760, net: 6840, trips: 11 },
-  { earnings_id: 5, driver_id: 105, period: "April 2025", gross: 18900, platform_fee: 1890, net: 17010, trips: 28 },
-  { earnings_id: 6, driver_id: 106, period: "April 2025", gross: 11300, platform_fee: 1130, net: 10170, trips: 16 },
+  { earnings_id: 1, booking_id: "BK-001", driver_id: 101, earning_date: "2025-04-01", period: "April 2025", gross: 12400, platform_fee: 1240, net: 11160, trips: 18 },
+  { earnings_id: 2, booking_id: "BK-002", driver_id: 102, earning_date: "2025-04-02", period: "April 2025", gross: 9800, platform_fee: 980, net: 8820, trips: 14 },
+  { earnings_id: 3, booking_id: "BK-003", driver_id: 103, earning_date: "2025-04-03", period: "April 2025", gross: 15200, platform_fee: 1520, net: 13680, trips: 22 },
+  { earnings_id: 4, booking_id: "BK-004", driver_id: 104, earning_date: "2025-04-04", period: "April 2025", gross: 7600, platform_fee: 760, net: 6840, trips: 11 },
+  { earnings_id: 5, booking_id: "BK-005", driver_id: 105, earning_date: "2025-04-05", period: "April 2025", gross: 18900, platform_fee: 1890, net: 17010, trips: 28 },
+  { earnings_id: 6, booking_id: "BK-006", driver_id: 106, earning_date: "2025-04-06", period: "April 2025", gross: 11300, platform_fee: 1130, net: 10170, trips: 16 },
 ];
