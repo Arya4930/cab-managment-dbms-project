@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowRight, CarFront, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, CarFront, KeyRound, Mail, ShieldCheck } from "lucide-react";
 
 import { API_BASE } from "../config/apiBase";
 const FALLBACK_ADMIN = {
@@ -12,6 +12,7 @@ const FALLBACK_ADMIN = {
 
 export default function Login({ currentAdmin, onLogin }) {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const normalizedFallbackEmail = useMemo(() => FALLBACK_ADMIN.email.toLowerCase(), []);
@@ -28,38 +29,39 @@ export default function Login({ currentAdmin, onLogin }) {
       setError("Admin email is required");
       return;
     }
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
 
     setSubmitting(true);
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE}/bootstrap`);
+      const response = await fetch(`${API_BASE}/auth/admin-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail, password }),
+      });
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Unable to load admins");
+        throw new Error(data.message || "Login failed");
       }
 
-      const adminUser =
-        (data.users ?? []).find(
-          (user) =>
-            String(user.user_type ?? "").toLowerCase() === "admin" &&
-            String(user.email ?? "").trim().toLowerCase() === normalizedEmail
-        ) ?? null;
-
-      if (adminUser) {
-        onLogin(adminUser);
+      if (data.user) {
+        onLogin(data.user);
         return;
       }
 
-      if (normalizedEmail === normalizedFallbackEmail) {
+      if (normalizedEmail === normalizedFallbackEmail && password === "123456") {
         onLogin(FALLBACK_ADMIN);
         return;
       }
 
-      setError("That email is not an admin account");
+      setError("Invalid admin credentials");
     } catch (err) {
-      if (normalizedEmail === normalizedFallbackEmail) {
+      if (normalizedEmail === normalizedFallbackEmail && password === "123456") {
         onLogin(FALLBACK_ADMIN);
         return;
       }
@@ -86,7 +88,7 @@ export default function Login({ currentAdmin, onLogin }) {
         <div className="login-copy">
           <h1 className="login-title">Admin Login</h1>
           <p className="login-subtitle">
-            Enter an admin email to open the dispatch board. No password is required in this test flow.
+            Enter admin credentials to open the dispatch board.
           </p>
         </div>
 
@@ -103,6 +105,21 @@ export default function Login({ currentAdmin, onLogin }) {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="admin@example.com"
               autoComplete="email"
+            />
+          </div>
+
+          <label className="login-label" htmlFor="password">
+            Password
+          </label>
+          <div className="login-inputWrap">
+            <KeyRound size={16} />
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Enter password"
+              autoComplete="current-password"
             />
           </div>
 

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowRight, Mail, MapPinned } from "lucide-react";
+import { ArrowRight, KeyRound, Mail, MapPinned } from "lucide-react";
 import { USERS } from "../data/mockData";
 
 import { API_BASE } from "../config/apiBase";
 
 export default function PassengerLogin({ currentPassenger, onLogin }) {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -22,6 +23,10 @@ export default function PassengerLogin({ currentPassenger, onLogin }) {
       setError("Passenger email is required");
       return;
     }
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
 
     setSubmitting(true);
     setError("");
@@ -30,14 +35,17 @@ export default function PassengerLogin({ currentPassenger, onLogin }) {
       const response = await fetch(`${API_BASE}/auth/passenger-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: normalizedEmail }),
+        body: JSON.stringify({ email: normalizedEmail, password }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
       onLogin(data.user);
     } catch (err) {
       const fallbackUser =
-        USERS.find((user) => String(user.email ?? "").trim().toLowerCase() === normalizedEmail) ?? null;
+        USERS.find(
+          (user) =>
+            String(user.email ?? "").trim().toLowerCase() === normalizedEmail && password === "123456"
+        ) ?? null;
 
       if (fallbackUser) {
         onLogin({ ...fallbackUser, user_type: fallbackUser.user_type ?? "Passenger" });
@@ -58,7 +66,7 @@ export default function PassengerLogin({ currentPassenger, onLogin }) {
         </div>
         <h1 className="portal-loginTitle">Track every ride from one clean screen</h1>
         <p className="portal-loginText">
-          Use your passenger email to see booked cabs, live trip status, payment actions, and trip ratings.
+          Use your passenger email and password to see booked cabs, live trip status, payment actions, and trip ratings.
         </p>
 
         <form className="portal-loginForm" onSubmit={handleSubmit}>
@@ -71,6 +79,19 @@ export default function PassengerLogin({ currentPassenger, onLogin }) {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
+            />
+          </div>
+
+          <label htmlFor="passenger-password">Password</label>
+          <div className="portal-loginInput">
+            <KeyRound size={16} />
+            <input
+              id="passenger-password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Enter password"
+              autoComplete="current-password"
             />
           </div>
           {error && <p className="login-error">{error}</p>}

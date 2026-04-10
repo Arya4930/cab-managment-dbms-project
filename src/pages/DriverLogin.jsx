@@ -7,6 +7,7 @@ import { API_BASE } from "../config/apiBase";
 
 export default function DriverLogin({ currentDriver, onLogin }) {
   const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -22,6 +23,10 @@ export default function DriverLogin({ currentDriver, onLogin }) {
       setError("Driver phone or license number is required");
       return;
     }
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
 
     setSubmitting(true);
     setError("");
@@ -30,7 +35,7 @@ export default function DriverLogin({ currentDriver, onLogin }) {
       const response = await fetch(`${API_BASE}/auth/driver-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: normalizedIdentifier }),
+        body: JSON.stringify({ identifier: normalizedIdentifier, password }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
@@ -40,7 +45,7 @@ export default function DriverLogin({ currentDriver, onLogin }) {
         DRIVERS.find((driver) => {
           const phone = String(driver.phone ?? "").trim().toLowerCase();
           const license = String(driver.license_no ?? "").trim().toLowerCase();
-          return phone === normalizedIdentifier || license === normalizedIdentifier;
+          return (phone === normalizedIdentifier || license === normalizedIdentifier) && password === "123456";
         }) ?? null;
 
       if (fallbackDriver) {
@@ -62,7 +67,7 @@ export default function DriverLogin({ currentDriver, onLogin }) {
         </div>
         <h1 className="portal-loginTitle">See assigned rides and move fast</h1>
         <p className="portal-loginText">
-          Sign in with your phone or license number to view live assignments, start rides, and complete trips.
+          Sign in with your phone or license number and password to view live assignments, start rides, and complete trips.
         </p>
 
         <form className="portal-loginForm" onSubmit={handleSubmit}>
@@ -74,6 +79,19 @@ export default function DriverLogin({ currentDriver, onLogin }) {
               value={identifier}
               onChange={(event) => setIdentifier(event.target.value)}
               placeholder="+91-97001-10001 or TN09-20210012"
+            />
+          </div>
+
+          <label htmlFor="driver-password">Password</label>
+          <div className="portal-loginInput">
+            <KeyRound size={16} />
+            <input
+              id="driver-password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Enter password"
+              autoComplete="current-password"
             />
           </div>
           {error && <p className="login-error">{error}</p>}

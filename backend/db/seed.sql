@@ -1,10 +1,10 @@
 -- Seed data aligned with src/data/mockData.js
 
-INSERT INTO users (user_id, name, email, phone_number, user_type, joined_date, total_rides) VALUES (1, 'Arjun Mehta', 'arjun@example.com', '+91-98001-11234', 'Passenger', TO_DATE('2023-01-15', 'YYYY-MM-DD'), 42);
-INSERT INTO users (user_id, name, email, phone_number, user_type, joined_date, total_rides) VALUES (2, 'Priya Sharma', 'priya@example.com', '+91-98001-22345', 'Passenger', TO_DATE('2023-03-08', 'YYYY-MM-DD'), 18);
-INSERT INTO users (user_id, name, email, phone_number, user_type, joined_date, total_rides) VALUES (3, 'Ravi Kumar', 'ravi@example.com', '+91-98001-33456', 'Passenger', TO_DATE('2022-11-20', 'YYYY-MM-DD'), 87);
-INSERT INTO users (user_id, name, email, phone_number, user_type, joined_date, total_rides) VALUES (4, 'Neha Patel', 'neha@example.com', '+91-98001-44567', 'Passenger', TO_DATE('2024-02-01', 'YYYY-MM-DD'), 5);
-INSERT INTO users (user_id, name, email, phone_number, user_type, joined_date, total_rides) VALUES (5, 'Suresh Iyer', 'suresh@example.com', '+91-98001-55678', 'Passenger', TO_DATE('2023-07-14', 'YYYY-MM-DD'), 31);
+INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (1, 'Arjun Mehta', 'arjun@example.com', '123456', '+91-98001-11234', 'Passenger', TO_DATE('2023-01-15', 'YYYY-MM-DD'), 42);
+INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (2, 'Priya Sharma', 'priya@example.com', '123456', '+91-98001-22345', 'Passenger', TO_DATE('2023-03-08', 'YYYY-MM-DD'), 18);
+INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (3, 'Ravi Kumar', 'ravi@example.com', '123456', '+91-98001-33456', 'Passenger', TO_DATE('2022-11-20', 'YYYY-MM-DD'), 87);
+INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (4, 'Neha Patel', 'neha@example.com', '123456', '+91-98001-44567', 'Passenger', TO_DATE('2024-02-01', 'YYYY-MM-DD'), 5);
+INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (5, 'Suresh Iyer', 'suresh@example.com', '123456', '+91-98001-55678', 'Passenger', TO_DATE('2023-07-14', 'YYYY-MM-DD'), 31);
 
 INSERT INTO cabs (cab_id, type, model, license_plate, cab_status, manufacture_year, color) VALUES (201, 'SUV', 'Toyota Innova Crysta', 'TN09 AB 1234', 'Active', 2022, 'Pearl White');
 INSERT INTO cabs (cab_id, type, model, license_plate, cab_status, manufacture_year, color) VALUES (202, 'Sedan', 'Maruti Swift Dzire', 'TN09 CD 5678', 'Active', 2021, 'Silver');
