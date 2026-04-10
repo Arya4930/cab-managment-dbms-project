@@ -12,11 +12,15 @@ const normalizeOrigin = (value) => {
     if (!trimmed) return "";
 
     // If scheme is missing in env, assume https for deployed frontends.
-    if (!/^https?:\/\//i.test(trimmed)) {
-        return `https://${trimmed}`;
-    }
+    const withScheme = /^https?:\/\//i.test(trimmed)
+        ? trimmed
+        : `https://${trimmed}`;
 
-    return trimmed;
+    try {
+        return new URL(withScheme).origin;
+    } catch {
+        return "";
+    }
 };
 
 const configuredOrigins = (process.env.FRONTEND_ORIGIN ?? "")
@@ -30,21 +34,28 @@ const allowedOrigins = new Set([
     "http://localhost:4173",
 ]);
 
+const isAllowedOrigin = (origin) => {
+    if (!origin) return true;
+
+    const normalizedRequestOrigin = normalizeOrigin(origin);
+    if (!normalizedRequestOrigin) return false;
+
+    // Permit configured origins.
+    if (allowedOrigins.has(normalizedRequestOrigin)) {
+        return true;
+    }
+
+    // Permit Vercel preview/prod deployments for this project.
+    return /^https:\/\/cab-managment-dbms-project(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(
+        normalizedRequestOrigin
+    );
+};
+
 app.use(
     cors({
         origin(origin, callback) {
-            // Allow non-browser or same-origin requests with no Origin header.
-            if (!origin) {
-                callback(null, true);
-                return;
-            }
-
-            if (allowedOrigins.has(origin)) {
-                callback(null, true);
-                return;
-            }
-
-            callback(new Error(`CORS blocked for origin: ${origin}`));
+            // Never throw from CORS middleware, otherwise browser sees HTTP 500.
+            callback(null, isAllowedOrigin(origin));
         },
     })
 );
