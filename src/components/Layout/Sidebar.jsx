@@ -8,8 +8,9 @@ import {
   CreditCard,
   TrendingUp,
   MapPin,
+  MessageSquare,
   ChevronRight,
-  Zap,
+  CarFront,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { to: "/payments", icon: CreditCard, label: "Payments", desc: "Transactions" },
   { to: "/earnings", icon: TrendingUp, label: "Earnings", desc: "Revenue & Reports" },
   { to: "/tracking", icon: MapPin, label: "Tracking", desc: "Live Ride Tracking" },
+  { to: "/feedback", icon: MessageSquare, label: "Feedback", desc: "App Feedback Inbox" },
 ];
 
 export default function Sidebar() {
@@ -30,11 +32,11 @@ export default function Sidebar() {
       {/* Brand */}
       <div className="sidebar-brand">
         <div className="brand-icon">
-          <Zap size={20} />
+          <CarFront size={20} />
         </div>
         <div className="brand-text">
           <span className="brand-name">CABEX</span>
-          <span className="brand-sub">Fleet Management</span>
+          <span className="brand-sub">Yellow Fleet Control</span>
         </div>
       </div>
 

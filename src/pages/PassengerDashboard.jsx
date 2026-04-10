@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CreditCard, MapPin, Plus, Star, TimerReset, Wallet } from "lucide-react";
+import { CreditCard, MapPin, Plus, Star, TimerReset, Wallet, Play, Ban, MessageSquare } from "lucide-react";
 import PortalShell from "../components/Portal/PortalShell";
 import Modal from "../components/Shared/Modal";
 import Badge from "../components/Shared/Badge";
@@ -23,6 +23,8 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
   const [paymentMethod, setPaymentMethod] = useState("UPI");
   const [ratingValue, setRatingValue] = useState("5");
   const [ratingReview, setRatingReview] = useState("");
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const [processing, setProcessing] = useState(false);
 
@@ -64,11 +66,11 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
     .filter((payment) => paidBookings.has(payment.booking_id) && myBookings.some((booking) => booking.booking_id === payment.booking_id))
     .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
 
-  const handleEndTrip = async (bookingId) => {
+  const handlePassengerAction = async (bookingId, action) => {
     setProcessing(true);
     setActionError("");
     try {
-      const response = await fetch(`${API_BASE}/passenger/bookings/${bookingId}/end`, {
+      const response = await fetch(`${API_BASE}/passenger/bookings/${bookingId}/${action}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: currentPassenger.user_id }),
@@ -77,7 +79,7 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
       if (!response.ok) throw new Error(responseData.message || "Request failed");
       await reload();
     } catch (err) {
-      setActionError(err.message || "Failed to end trip");
+      setActionError(err.message || "Failed to update ride");
     } finally {
       setProcessing(false);
     }
@@ -136,6 +138,36 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
     }
   };
 
+  const submitFeedback = async () => {
+    const message = feedbackMessage.trim();
+    if (!message) {
+      setActionError("Feedback message is required");
+      return;
+    }
+
+    setProcessing(true);
+    setActionError("");
+    try {
+      const response = await fetch(`${API_BASE}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: currentPassenger.user_id,
+          message,
+        }),
+      });
+      const responseData = await response.json();
+      if (!response.ok) throw new Error(responseData.message || "Request failed");
+      setFeedbackOpen(false);
+      setFeedbackMessage("");
+      await reload();
+    } catch (err) {
+      setActionError(err.message || "Failed to submit feedback");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="page-loading">
@@ -163,6 +195,12 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
         <StatCard title="Total Spent" value={`Rs ${totalSpent.toLocaleString()}`} icon={CreditCard} accent="var(--accent-rose)" />
       </div>
 
+      <div style={{ marginBottom: "18px", display: "flex", justifyContent: "flex-end" }}>
+        <button className="btn btn--ghost" onClick={() => setFeedbackOpen(true)}>
+          <MessageSquare size={14} /> Add Feedback
+        </button>
+      </div>
+
       {activeBooking && (
         <div className="portal-heroCard">
           <div>
@@ -174,9 +212,21 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
           </div>
           <div className="portal-heroCard__actions">
             <Badge label={activeBooking.status} type={statusTypeMap[activeBooking.status] ?? "neutral"} />
-            <button className="btn btn--primary" disabled={processing} onClick={() => handleEndTrip(activeBooking.booking_id)}>
-              End Trip
-            </button>
+            {activeBooking.status === "Scheduled" && (
+              <button className="btn btn--primary" disabled={processing} onClick={() => handlePassengerAction(activeBooking.booking_id, "start")}>
+                <Play size={14} /> Start Ride
+              </button>
+            )}
+            {activeBooking.status === "In Progress" && (
+              <button className="btn btn--primary" disabled={processing} onClick={() => handlePassengerAction(activeBooking.booking_id, "end")}>
+                End Trip
+              </button>
+            )}
+            {["Scheduled", "In Progress"].includes(activeBooking.status) && (
+              <button className="btn btn--ghost" disabled={processing} onClick={() => handlePassengerAction(activeBooking.booking_id, "cancel")}>
+                <Ban size={14} /> Cancel Ride
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -198,6 +248,16 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
               <span>Fare: <strong>Rs {Number(booking.fare || 0).toLocaleString()}</strong></span>
             </div>
             <div className="portal-bookingCard__actions">
+              {booking.status === "Scheduled" && (
+                <button className="btn btn--primary" disabled={processing} onClick={() => handlePassengerAction(booking.booking_id, "start")}>
+                  <Play size={14} /> Start Ride
+                </button>
+              )}
+              {["Scheduled", "In Progress"].includes(booking.status) && (
+                <button className="btn btn--ghost" disabled={processing} onClick={() => handlePassengerAction(booking.booking_id, "cancel")}>
+                  <Ban size={14} /> Cancel Ride
+                </button>
+              )}
               {!booking.isPaid && booking.status === "Completed" && (
                 <button className="btn btn--primary" onClick={() => setPaymentBookingId(booking.booking_id)}>
                   <Plus size={14} /> Pay
@@ -244,6 +304,24 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
         <div className="modal-actions">
           <button className="btn btn--ghost" onClick={() => setRatingBookingId(null)}>Cancel</button>
           <button className="btn btn--primary" onClick={submitRating} disabled={processing}>Submit Rating</button>
+        </div>
+      </Modal>
+
+      <Modal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} title="Share App Feedback">
+        <div className="form-grid">
+          <div className="form-group form-group--full">
+            <label>Your Feedback</label>
+            <textarea
+              rows={5}
+              value={feedbackMessage}
+              onChange={(event) => setFeedbackMessage(event.target.value)}
+              placeholder="Tell us what can be improved in the app experience..."
+            />
+          </div>
+        </div>
+        <div className="modal-actions">
+          <button className="btn btn--ghost" onClick={() => setFeedbackOpen(false)}>Cancel</button>
+          <button className="btn btn--primary" onClick={submitFeedback} disabled={processing}>Submit Feedback</button>
         </div>
       </Modal>
     </PortalShell>

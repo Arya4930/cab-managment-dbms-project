@@ -7,8 +7,10 @@ import {
   BOOKINGS,
   RIDE_TRACKING,
   RATINGS_REVIEWS,
+  FEEDBACK,
   PAYMENTS,
   EARNINGS,
+  SAVED_LOCATIONS,
 } from "../data/mockData";
 
 const API_BASE = "http://localhost:3000/api";
@@ -21,8 +23,10 @@ const FALLBACK_DATA = {
   bookings: BOOKINGS,
   ride_tracking: RIDE_TRACKING,
   ratings_reviews: RATINGS_REVIEWS,
+  feedback: FEEDBACK,
   payments: PAYMENTS,
   earnings: EARNINGS,
+  saved_locations: SAVED_LOCATIONS,
 };
 
 export default function useBootstrapData() {

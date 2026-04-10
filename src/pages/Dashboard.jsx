@@ -15,6 +15,7 @@ function BarChart({ data, label }) {
       <div className="bar-chart">
         {data.map((d, i) => (
           <div key={i} className="bar-col">
+            {d.value}
             <div
               className="bar"
               style={{ height: `${(d.value / max) * 100}%` }}

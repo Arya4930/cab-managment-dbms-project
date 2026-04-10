@@ -34,6 +34,16 @@ export default function Earnings() {
     [earnings, editingEarningId]
   );
 
+  const resolvedEarnings = useMemo(
+    () =>
+      earnings.map((entry) => ({
+        ...entry,
+        driver_name:
+          entry.driver_name ?? drivers.find((driverRow) => driverRow.driver_id === entry.driver_id)?.name ?? "—",
+      })),
+    [drivers, earnings]
+  );
+
   useEffect(() => {
     setEarnings(data.earnings ?? []);
   }, [data.earnings]);
@@ -152,7 +162,6 @@ export default function Earnings() {
 
   const totalGross = earnings.reduce((sum, entry) => sum + Number(entry.gross || 0), 0);
   const totalFee = earnings.reduce((sum, entry) => sum + Number(entry.platform_fee || 0), 0);
-  const totalNet = earnings.reduce((sum, entry) => sum + Number(entry.net || 0), 0);
   const totalTrips = earnings.reduce((sum, entry) => sum + Number(entry.trips || 0), 0);
 
   if (loading) {
@@ -180,10 +189,10 @@ export default function Earnings() {
       </div>
 
       <div className="stat-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-        <StatCard title="Gross Earnings" value={`Rs ${totalGross.toLocaleString()}`} icon={Banknote} accent="var(--accent-emerald)" />
+        <StatCard title="Driver Share" value={`Rs ${totalGross.toLocaleString()}`} icon={Banknote} accent="var(--accent-emerald)" />
         <StatCard title="Platform Fee" value={`Rs ${totalFee.toLocaleString()}`} icon={Wallet} accent="var(--accent-amber)" />
-        <StatCard title="Driver Net" value={`Rs ${totalNet.toLocaleString()}`} icon={Coins} accent="var(--accent-blue)" />
-        <StatCard title="Trips Logged" value={totalTrips} icon={Plus} accent="var(--accent-violet)" />
+        <StatCard title="Trips Logged" value={totalTrips} icon={Plus} accent="var(--accent-blue)" />
+        <StatCard title="Records" value={resolvedEarnings.length} icon={Coins} accent="var(--accent-violet)" />
       </div>
 
       <div className="section-card">
@@ -192,29 +201,23 @@ export default function Earnings() {
             <thead>
               <tr>
                 <th>Earning ID</th>
-                <th>Driver</th>
-                <th>Booking</th>
-                <th>Date</th>
+                <th>Driver ID</th>
+                <th>Driver Name</th>
                 <th>Gross</th>
                 <th>Platform Fee</th>
-                <th>Net</th>
                 <th>Trips</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {earnings.map((entry) => {
-                const driver = drivers.find((driverRow) => driverRow.driver_id === entry.driver_id);
-
+              {resolvedEarnings.map((entry) => {
                 return (
                   <tr key={entry.earnings_id}>
                     <td className="mono">#{entry.earnings_id}</td>
-                    <td>{driver?.name ?? "—"}</td>
-                    <td className="mono">{entry.booking_id ?? "—"}</td>
-                    <td>{entry.earning_date ?? entry.period}</td>
+                    <td className="mono">#{entry.driver_id}</td>
+                    <td>{entry.driver_name}</td>
                     <td>Rs {Number(entry.gross || 0).toLocaleString()}</td>
                     <td>Rs {Number(entry.platform_fee || 0).toLocaleString()}</td>
-                    <td>Rs {Number(entry.net || 0).toLocaleString()}</td>
                     <td>{entry.trips}</td>
                     <td>
                       <div style={{ display: "flex", gap: "8px" }}>
@@ -237,7 +240,7 @@ export default function Earnings() {
       <Modal isOpen={modalOpen} onClose={closeModal} title={isEditing ? "Edit Earnings" : "Create Earnings"}>
         <div className="form-grid">
           <div className="form-group">
-            <label>Booking</label>
+            <label>Booking ID</label>
             <select name="booking_id" value={form.booking_id} onChange={handleChange}>
               <option value="">Select booking...</option>
               {bookings.map((booking) => (
@@ -249,11 +252,11 @@ export default function Earnings() {
             {errors.booking_id && <span className="form-error">{errors.booking_id}</span>}
           </div>
           <div className="form-group">
-            <label>Driver</label>
+            <label>Driver ID</label>
             <select name="driver_id" value={form.driver_id} onChange={handleChange}>
               <option value="">Select driver...</option>
               {drivers.map((driver) => (
-                <option key={driver.driver_id} value={driver.driver_id}>{driver.name}</option>
+                <option key={driver.driver_id} value={driver.driver_id}>#{driver.driver_id} · {driver.name}</option>
               ))}
             </select>
             {errors.driver_id && <span className="form-error">{errors.driver_id}</span>}

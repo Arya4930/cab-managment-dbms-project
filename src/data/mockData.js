@@ -62,6 +62,20 @@ export const RATINGS_REVIEWS = [
   { review_id: 3, booking_id: "BK-004", user_id: 4, driver_id: 105, rating: 5, review: "Wonderful experience!", date: "2025-04-04" },
 ];
 
+export const FEEDBACK = [
+  { feedback_id: 1, user_id: 1, message: "App is smooth and booking flow is clear." },
+  { feedback_id: 2, user_id: 2, message: "Please add more pickup suggestions in Chennai." },
+];
+
+export const SAVED_LOCATIONS = [
+  { location_id: 1, location_name: "Chennai Central", address: "Chennai Central Railway Station, Park Town", user_id: 1 },
+  { location_id: 2, location_name: "Chennai Airport", address: "Chennai International Airport (MAA), Meenambakkam", user_id: 2 },
+  { location_id: 3, location_name: "T Nagar", address: "Pondy Bazaar, T. Nagar, Chennai", user_id: 3 },
+  { location_id: 4, location_name: "OMR IT Corridor", address: "Old Mahabalipuram Road, Chennai", user_id: 4 },
+  { location_id: 5, location_name: "Velachery", address: "Velachery MRTS Station, Chennai", user_id: 5 },
+  { location_id: 6, location_name: "Koyambedu", address: "CMBT Bus Terminus, Koyambedu, Chennai", user_id: 1 },
+];
+
 export const PAYMENTS = [
   { payment_id: "PAY-001", booking_id: "BK-001", amount: 850, method: "UPI", status: "Success", timestamp: "2025-04-01 08:52" },
   { payment_id: "PAY-002", booking_id: "BK-002", amount: 420, method: "Card", status: "Success", timestamp: "2025-04-02 15:18" },

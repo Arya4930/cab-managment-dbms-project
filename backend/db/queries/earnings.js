@@ -13,6 +13,22 @@ export const earningsSelectSql = `
   WHERE earning_id = :earning_id
 `;
 
+export const selectEarningByBookingIdSql = `
+  SELECT
+    earning_id AS "earnings_id",
+    TO_CHAR(earning_date, 'YYYY-MM-DD') AS "earning_date",
+    TO_CHAR(earning_date, 'Month YYYY') AS "period",
+    driver_amount AS "gross",
+    platform_fee AS "platform_fee",
+    (driver_amount - platform_fee) AS "net",
+    booking_id AS "booking_id",
+    driver_id AS "driver_id",
+    trips AS "trips"
+  FROM earnings
+  WHERE UPPER(TRIM(booking_id)) = :booking_id
+  FETCH FIRST 1 ROWS ONLY
+`;
+
 export const insertEarningSql = `
   INSERT INTO earnings (
     earning_date,

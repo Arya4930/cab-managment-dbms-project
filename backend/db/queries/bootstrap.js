@@ -89,6 +89,23 @@ export const bootstrapQueries = {
     FROM ratings_reviews
     ORDER BY review_id
   `,
+  feedback: `
+    SELECT
+      feedback_id AS "feedback_id",
+      DBMS_LOB.SUBSTR(message, 4000, 1) AS "message",
+      user_id AS "user_id"
+    FROM feedback
+    ORDER BY feedback_id DESC
+  `,
+  saved_locations: `
+    SELECT
+      location_id AS "location_id",
+      location_name AS "location_name",
+      address AS "address",
+      user_id AS "user_id"
+    FROM saved_location
+    ORDER BY location_id DESC
+  `,
   payments: `
     SELECT
       payment_id AS "payment_id",
@@ -103,15 +120,14 @@ export const bootstrapQueries = {
   earnings: `
     SELECT
       earning_id AS "earnings_id",
-      TO_CHAR(earning_date, 'YYYY-MM-DD') AS "earning_date",
-      TO_CHAR(earning_date, 'Month YYYY') AS "period",
+      e.driver_id AS "driver_id",
+      d.driver_name AS "driver_name",
       driver_amount AS "gross",
       platform_fee AS "platform_fee",
       (driver_amount - platform_fee) AS "net",
-      booking_id AS "booking_id",
-      driver_id AS "driver_id",
       trips AS "trips"
-    FROM earnings
+    FROM earnings e
+    LEFT JOIN drivers d ON d.driver_id = e.driver_id
     ORDER BY earning_id
   `,
 };

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowRight, Mail, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, CarFront, Mail, ShieldCheck } from "lucide-react";
 
 const API_BASE = "http://localhost:3000/api";
 const FALLBACK_ADMIN = {
@@ -75,18 +75,18 @@ export default function Login({ currentAdmin, onLogin }) {
       <div className="login-panel">
         <div className="login-brand">
           <div className="login-brand__icon">
-            <Zap size={22} />
+            <CarFront size={22} />
           </div>
           <div>
             <div className="login-brand__name">CABEX Admin</div>
-            <div className="login-brand__sub">Testing-only access with admin email</div>
+            <div className="login-brand__sub">Dispatch booth access with admin email</div>
           </div>
         </div>
 
         <div className="login-copy">
           <h1 className="login-title">Admin Login</h1>
           <p className="login-subtitle">
-            Enter an admin email to unlock the dashboard. No password is required in this test flow.
+            Enter an admin email to open the dispatch board. No password is required in this test flow.
           </p>
         </div>
 

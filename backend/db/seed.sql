@@ -70,6 +70,24 @@ VALUES (2, 4, 'Good service, comfortable car.', 2, 102, 'BK-002', TO_DATE('2025-
 INSERT INTO ratings_reviews (review_id, rating, review, user_id, driver_id, booking_id, review_date)
 VALUES (3, 5, 'Wonderful experience!', 4, 105, 'BK-004', TO_DATE('2025-04-04', 'YYYY-MM-DD'));
 
+INSERT INTO feedback (feedback_id, message, user_id)
+VALUES (1, 'App is smooth and booking flow is clear.', 1);
+INSERT INTO feedback (feedback_id, message, user_id)
+VALUES (2, 'Please add more pickup suggestions in Chennai.', 2);
+
+INSERT INTO saved_location (location_id, location_name, address, user_id)
+VALUES (1, 'Chennai Central', 'Chennai Central Railway Station, Park Town', 1);
+INSERT INTO saved_location (location_id, location_name, address, user_id)
+VALUES (2, 'Chennai Airport', 'Chennai International Airport (MAA), Meenambakkam', 2);
+INSERT INTO saved_location (location_id, location_name, address, user_id)
+VALUES (3, 'T Nagar', 'Pondy Bazaar, T. Nagar, Chennai', 3);
+INSERT INTO saved_location (location_id, location_name, address, user_id)
+VALUES (4, 'OMR IT Corridor', 'Old Mahabalipuram Road, Chennai', 4);
+INSERT INTO saved_location (location_id, location_name, address, user_id)
+VALUES (5, 'Velachery', 'Velachery MRTS Station, Chennai', 5);
+INSERT INTO saved_location (location_id, location_name, address, user_id)
+VALUES (6, 'Koyambedu', 'CMBT Bus Terminus, Koyambedu, Chennai', 1);
+
 INSERT INTO payment (payment_id, amount, payment_method, payment_status, booking_id, created_at)
 VALUES ('PAY-001', 850, 'UPI', 'Success', 'BK-001', TO_DATE('2025-04-01 08:52', 'YYYY-MM-DD HH24:MI'));
 INSERT INTO payment (payment_id, amount, payment_method, payment_status, booking_id, created_at)

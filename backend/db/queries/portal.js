@@ -10,6 +10,12 @@ export const updateBookingInProgressSql = `
   WHERE UPPER(TRIM(booking_id)) = :booking_id
 `;
 
+export const updateBookingCancelledSql = `
+  UPDATE bookings
+  SET status = 'Cancelled'
+  WHERE UPPER(TRIM(booking_id)) = :booking_id
+`;
+
 export const updateUserRidesSql = `
   UPDATE users
   SET total_rides = total_rides + :ride_increment
@@ -41,6 +47,31 @@ export const insertReviewSql = `
     booking_id,
     review_date
   ) VALUES (
+    :rating,
+    :review,
+    :user_id,
+    :driver_id,
+    :booking_id,
+    :review_date
+  )
+`;
+
+export const selectNextReviewIdSql = `
+  SELECT NVL(MAX(review_id), 0) + 1 AS "next_review_id"
+  FROM ratings_reviews
+`;
+
+export const insertReviewWithIdSql = `
+  INSERT INTO ratings_reviews (
+    review_id,
+    rating,
+    review,
+    user_id,
+    driver_id,
+    booking_id,
+    review_date
+  ) VALUES (
+    :review_id,
     :rating,
     :review,
     :user_id,

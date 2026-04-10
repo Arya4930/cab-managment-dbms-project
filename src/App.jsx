@@ -10,6 +10,7 @@ import Maintenance from "./pages/Maintenance";
 import Payments from "./pages/Payments";
 import Earnings from "./pages/Earnings";
 import Tracking from "./pages/Tracking";
+import Feedback from "./pages/Feedback";
 import Login from "./pages/Login";
 import PassengerLogin from "./pages/PassengerLogin";
 import DriverLogin from "./pages/DriverLogin";
@@ -117,6 +118,7 @@ export default function App() {
           <Route path="payments" element={<Payments />} />
           <Route path="earnings" element={<Earnings />} />
           <Route path="tracking" element={<Tracking />} />
+          <Route path="feedback" element={<Feedback />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
         <Route

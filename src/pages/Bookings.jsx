@@ -32,6 +32,7 @@ export default function Bookings() {
   const drivers = data.drivers ?? [];
   const cabs = data.cabs ?? [];
   const users = data.users ?? [];
+  const savedLocations = data.saved_locations ?? [];
   const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -42,12 +43,38 @@ export default function Bookings() {
   const [submitError, setSubmitError] = useState("");
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [fareTouched, setFareTouched] = useState(false);
 
   const isEditing = editingBookingId !== null;
   const editingBooking = useMemo(
     () => bookings.find((booking) => booking.booking_id === editingBookingId) ?? null,
     [bookings, editingBookingId]
   );
+
+  const locationRecommendations = useMemo(() => {
+    const seen = new Set();
+    const deduped = [];
+
+    for (const location of savedLocations) {
+      const key = `${location.location_name}::${location.address}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(location);
+    }
+
+    return deduped.slice(0, 8);
+  }, [savedLocations]);
+
+  const recommendedFare = useMemo(() => {
+    const distance = Number(form.distance_km || 0);
+    if (!Number.isFinite(distance) || distance <= 0) {
+      return 0;
+    }
+
+    // Base fare + per-km rate (20 km -> Rs 300)
+    const suggested = 100 + distance * 10;
+    return Math.max(100, Math.round(suggested));
+  }, [form.distance_km]);
 
   useEffect(() => {
     setBookings(data.bookings ?? []);
@@ -73,7 +100,17 @@ export default function Bookings() {
     }
     setErrors({});
     setSubmitError("");
+    setFareTouched(false);
   }, [modalOpen, editingBooking]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    if (isEditing) return;
+    if (fareTouched) return;
+    if (!recommendedFare) return;
+
+    setForm((prev) => ({ ...prev, fare: String(recommendedFare) }));
+  }, [modalOpen, isEditing, fareTouched, recommendedFare]);
 
   const filtered = bookings.filter((b) => {
     const matchStatus = statusFilter === "All" || b.status === statusFilter;
@@ -87,6 +124,10 @@ export default function Bookings() {
   });
 
   const handleChange = (event) => {
+    if (event.target.name === "fare") {
+      setFareTouched(true);
+    }
+
     setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
     setErrors((prev) => ({ ...prev, [event.target.name]: "" }));
   };
@@ -106,6 +147,7 @@ export default function Bookings() {
   const openCreateModal = () => {
     setEditingBookingId(null);
     setModalOpen(true);
+    setFareTouched(false);
   };
 
   const openEditModal = (booking) => {
@@ -340,16 +382,62 @@ export default function Bookings() {
             <label>Pickup Location</label>
             <input type="text" name="pickup" placeholder="e.g. Chennai Central Railway Station" value={form.pickup} onChange={handleChange} />
             {errors.pickup && <span className="form-error">{errors.pickup}</span>}
+            {locationRecommendations.length > 0 && (
+              <div style={{ marginTop: "8px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {locationRecommendations.map((location) => (
+                  <button
+                    key={`pickup-${location.location_id}`}
+                    type="button"
+                    className="btn btn--ghost"
+                    onClick={() => setForm((prev) => ({ ...prev, pickup: location.address }))}
+                    style={{ padding: "6px 10px", fontSize: "12px" }}
+                  >
+                    {location.location_name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="form-group form-group--full">
             <label>Drop-off Location</label>
             <input type="text" name="dropoff" placeholder="e.g. Chennai Airport (MAA)" value={form.dropoff} onChange={handleChange} />
             {errors.dropoff && <span className="form-error">{errors.dropoff}</span>}
+            {locationRecommendations.length > 0 && (
+              <div style={{ marginTop: "8px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {locationRecommendations.map((location) => (
+                  <button
+                    key={`dropoff-${location.location_id}`}
+                    type="button"
+                    className="btn btn--ghost"
+                    onClick={() => setForm((prev) => ({ ...prev, dropoff: location.address }))}
+                    style={{ padding: "6px 10px", fontSize: "12px" }}
+                  >
+                    {location.location_name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label>Fare (₹)</label>
             <input type="number" name="fare" placeholder="e.g. 750" value={form.fare} onChange={handleChange} min="1" />
             {errors.fare && <span className="form-error">{errors.fare}</span>}
+            {recommendedFare > 0 && (
+              <div style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <span className="muted">Suggested fare for {Number(form.distance_km || 0)} km: Rs {recommendedFare}</span>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  style={{ padding: "5px 10px", fontSize: "12px" }}
+                  onClick={() => {
+                    setForm((prev) => ({ ...prev, fare: String(recommendedFare) }));
+                    setFareTouched(true);
+                  }}
+                >
+                  Use suggested
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
