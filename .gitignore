@@ -36,6 +36,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env
 .env.development.local
+backend/.env
+
+# oracle wallet / network config
+backend/oracle_config/
 
 # vercel
 .vercel

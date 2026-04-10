@@ -1,80 +1,65 @@
 import oracledb from "oracledb";
 import "dotenv/config";
+import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 
 // Avoid Express JSON serialization errors for Oracle CLOB/Lob objects.
 oracledb.fetchAsString = [oracledb.CLOB];
 
-function isLikelyTnsAlias(value) {
-    if (!value) {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function hasOracleNetFiles(dir) {
+    if (!dir) {
         return false;
     }
 
-    const text = String(value).trim();
-    if (!text) {
+    try {
+        const tns = path.join(dir, "tnsnames.ora");
+        const sqlnet = path.join(dir, "sqlnet.ora");
+        return fs.existsSync(tns) || fs.existsSync(sqlnet);
+    } catch {
         return false;
     }
-
-    // Alias usually looks like: mydb_high
-    // Direct strings usually contain host/service delimiters.
-    return (
-        !text.includes(":") &&
-        !text.includes("/") &&
-        !text.includes("(") &&
-        !text.includes("=")
-    );
 }
 
-function resolveConnectString() {
-    const configured = String(process.env.DB_CONNECT_STRING ?? "").trim();
-    const host = String(process.env.DB_HOST ?? "").trim();
-    const port = String(process.env.DB_PORT ?? "1521").trim();
-    const service = String(process.env.DB_SERVICE_NAME ?? process.env.DB_SERVICE ?? "").trim();
-    const tnsAdmin = String(
-        process.env.TNS_ADMIN ?? process.env.ORACLE_NET_TNS_ADMIN ?? process.env.DB_CONFIG_DIR ?? ""
-    ).trim();
-
-    if (!configured && host && service) {
-        return `${host}:${port}/${service}`;
+function resolveConfigDir() {
+    const explicit = String(process.env.TNS_ADMIN || process.env.ORACLE_NET_TNS_ADMIN || "").trim();
+    if (explicit) {
+        return explicit;
     }
 
-    if (configured && isLikelyTnsAlias(configured) && !tnsAdmin) {
-        if (host && service) {
-            return `${host}:${port}/${service}`;
-        }
-
-        console.warn(
-            "[oracle] DB_CONNECT_STRING looks like a TNS alias but no TNS config directory is set. " +
-            "Set TNS_ADMIN/ORACLE_NET_TNS_ADMIN (wallet + tnsnames.ora), or set DB_HOST + DB_PORT + DB_SERVICE_NAME " +
-            "to use Easy Connect."
-        );
-        return configured;
+    // Render Secret Files are available from /etc/secrets/<filename>.
+    if (hasOracleNetFiles("/etc/secrets")) {
+        return "/etc/secrets";
     }
 
-    return configured;
+    // Render can also expose secret files at app root.
+    const appRoot = process.cwd();
+    if (hasOracleNetFiles(appRoot)) {
+        return appRoot;
+    }
+
+    // Local development fallback.
+    const localOracleConfig = path.join(__dirname, "oracle_config");
+    if (hasOracleNetFiles(localOracleConfig)) {
+        return localOracleConfig;
+    }
+
+    return undefined;
 }
 
-const tnsAdmin = String(
-    process.env.TNS_ADMIN ?? process.env.ORACLE_NET_TNS_ADMIN ?? process.env.DB_CONFIG_DIR ?? ""
-).trim();
-const walletLocation = String(process.env.DB_WALLET_LOCATION ?? "").trim();
-const walletPassword = String(process.env.DB_WALLET_PASSWORD ?? "").trim();
+const configDir = resolveConfigDir();
 
 const dbConfig = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    connectString: resolveConnectString(),
+    connectString: process.env.DB_CONNECT_STRING,
 };
 
-if (tnsAdmin) {
-    dbConfig.configDir = tnsAdmin;
-}
-
-if (walletLocation) {
-    dbConfig.walletLocation = walletLocation;
-}
-
-if (walletPassword) {
-    dbConfig.walletPassword = walletPassword;
+if (configDir) {
+    dbConfig.configDir = configDir;
 }
 
 export default async function getConnection() {
