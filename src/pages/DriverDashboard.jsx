@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { BriefcaseBusiness, CarFront, Gauge, MapPinned, CheckCircle2, Star, Ban } from "lucide-react";
 import PortalShell from "../components/Portal/PortalShell";
-import Badge from "../components/Shared/Badge";
-import StatCard from "../components/Shared/StatCard";
+import Badge from "../components/shared/Badge";
+import StatCard from "../components/shared/StatCard";
 import useBootstrapData from "../hooks/useBootstrapData";
 
 import { API_BASE } from "../config/apiBase";

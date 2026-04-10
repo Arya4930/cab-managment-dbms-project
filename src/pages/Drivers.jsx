@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import Modal from "../components/Shared/Modal";
-import Badge from "../components/Shared/Badge";
-import StatCard from "../components/Shared/StatCard";
+import Modal from "../components/shared/Modal";
+import Badge from "../components/shared/Badge";
+import StatCard from "../components/shared/StatCard";
 import { Users, Star, Truck, UserCheck, Plus, PencilLine } from "lucide-react";
 import useBootstrapData from "../hooks/useBootstrapData";
 

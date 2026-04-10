@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Banknote, Coins, Plus, Wallet, PencilLine, Trash2 } from "lucide-react";
-import Modal from "../components/Shared/Modal";
-import StatCard from "../components/Shared/StatCard";
+import Modal from "../components/shared/Modal";
+import StatCard from "../components/shared/StatCard";
 import useBootstrapData from "../hooks/useBootstrapData";
 
 import { API_BASE } from "../config/apiBase";

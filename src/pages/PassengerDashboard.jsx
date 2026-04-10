@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { CreditCard, MapPin, Plus, Star, TimerReset, Wallet, Play, Ban, MessageSquare } from "lucide-react";
 import PortalShell from "../components/Portal/PortalShell";
-import Modal from "../components/Shared/Modal";
-import Badge from "../components/Shared/Badge";
-import StatCard from "../components/Shared/StatCard";
+import Modal from "../components/shared/Modal";
+import Badge from "../components/shared/Badge";
+import StatCard from "../components/shared/StatCard";
 import useBootstrapData from "../hooks/useBootstrapData";
 
 import { API_BASE } from "../config/apiBase";

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import Modal from "../components/Shared/Modal";
-import Badge from "../components/Shared/Badge";
+import Modal from "../components/shared/Modal";
+import Badge from "../components/shared/Badge";
 import { Plus, Search, Filter, MapPin, PencilLine, Trash2 } from "lucide-react";
 import useBootstrapData from "../hooks/useBootstrapData";
 

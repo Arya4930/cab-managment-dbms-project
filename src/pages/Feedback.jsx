@@ -1,5 +1,5 @@
 import { MessageSquare, Users } from "lucide-react";
-import StatCard from "../components/Shared/StatCard";
+import StatCard from "../components/shared/StatCard";
 import useBootstrapData from "../hooks/useBootstrapData";
 
 export default function Feedback() {

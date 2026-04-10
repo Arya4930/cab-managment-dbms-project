@@ -1,6 +1,6 @@
 import useBootstrapData from "../hooks/useBootstrapData";
-import StatCard from "../components/Shared/StatCard";
-import Badge from "../components/Shared/Badge";
+import StatCard from "../components/shared/StatCard";
+import Badge from "../components/shared/Badge";
 import {
   CalendarCheck, Users, Truck, TrendingUp,
   Star, CreditCard, Activity, Clock,
