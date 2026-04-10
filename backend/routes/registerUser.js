@@ -23,6 +23,7 @@ router.post("/register", async (req, res) => {
             {
                 name,
                 email,
+                password: "123456",
                 phone,
                 user_type,
                 id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
