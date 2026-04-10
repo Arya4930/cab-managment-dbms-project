@@ -42,11 +42,12 @@ function resolveConnectString() {
             return `${host}:${port}/${service}`;
         }
 
-        throw new Error(
-            "Oracle connect string is a TNS alias, but no TNS config directory is set. " +
-            "Set TNS_ADMIN (or ORACLE_NET_TNS_ADMIN) with wallet/tnsnames.ora, or provide " +
-            "DB_HOST + DB_PORT + DB_SERVICE_NAME for Easy Connect."
+        console.warn(
+            "[oracle] DB_CONNECT_STRING looks like a TNS alias but no TNS config directory is set. " +
+            "Set TNS_ADMIN/ORACLE_NET_TNS_ADMIN (wallet + tnsnames.ora), or set DB_HOST + DB_PORT + DB_SERVICE_NAME " +
+            "to use Easy Connect."
         );
+        return configured;
     }
 
     return configured;
