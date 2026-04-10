@@ -13,7 +13,7 @@ import {
   SAVED_LOCATIONS,
 } from "../data/mockData";
 
-const API_BASE = "http://localhost:3000/api";
+import { API_BASE } from "../config/apiBase";
 
 const FALLBACK_DATA = {
   users: USERS,

@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, Mail, MapPinned } from "lucide-react";
 import { USERS } from "../data/mockData";
 
-const API_BASE = "http://localhost:3000/api";
+import { API_BASE } from "../config/apiBase";
 
 export default function PassengerLogin({ currentPassenger, onLogin }) {
   const [email, setEmail] = useState("");

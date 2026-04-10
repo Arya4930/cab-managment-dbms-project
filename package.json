@@ -1,12 +1,15 @@
 {
   "name": "cabex-fleet-management",
   "version": "1.0.0",
+  "homepage": "https://arya4930.github.io/cab-managment-dbms-project",
   "private": true,
   "description": "CABEX — Cab Booking & Fleet Management System",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist",
+    "predeploy": "npm run build"
   },
   "dependencies": {
     "lucide-react": "^0.383.0",

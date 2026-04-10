@@ -5,7 +5,7 @@ import Badge from "../components/Shared/Badge";
 import StatCard from "../components/Shared/StatCard";
 import useBootstrapData from "../hooks/useBootstrapData";
 
-const API_BASE = "http://localhost:3000/api";
+import { API_BASE } from "../config/apiBase";
 const PAYMENT_METHODS = ["UPI", "Card", "Cash", "Wallet"];
 const PAYMENT_STATUS = ["Success", "Pending", "Refunded", "Failed"];
 

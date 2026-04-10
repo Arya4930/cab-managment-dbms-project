@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, CarFront, Mail, ShieldCheck } from "lucide-react";
 
-const API_BASE = "http://localhost:3000/api";
+import { API_BASE } from "../config/apiBase";
 const FALLBACK_ADMIN = {
   user_id: "dev-admin",
   name: "Test Admin",

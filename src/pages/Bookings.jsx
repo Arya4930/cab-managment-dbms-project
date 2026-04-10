@@ -4,7 +4,7 @@ import Badge from "../components/Shared/Badge";
 import { Plus, Search, Filter, MapPin, PencilLine, Trash2 } from "lucide-react";
 import useBootstrapData from "../hooks/useBootstrapData";
 
-const API_BASE = "http://localhost:3000/api";
+import { API_BASE } from "../config/apiBase";
 
 const STATUS_OPTIONS = ["All", "Completed", "In Progress", "Scheduled", "Cancelled"];
 

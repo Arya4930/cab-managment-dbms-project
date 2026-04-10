@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, CarFront, KeyRound } from "lucide-react";
 import { DRIVERS } from "../data/mockData";
 
-const API_BASE = "http://localhost:3000/api";
+import { API_BASE } from "../config/apiBase";
 
 export default function DriverLogin({ currentDriver, onLogin }) {
   const [identifier, setIdentifier] = useState("");

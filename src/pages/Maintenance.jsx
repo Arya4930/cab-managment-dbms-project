@@ -5,7 +5,7 @@ import StatCard from "../components/Shared/StatCard";
 import { Wrench, Plus, AlertTriangle, CheckCircle, Clock, PencilLine, Trash2 } from "lucide-react";
 import useBootstrapData from "../hooks/useBootstrapData";
 
-const API_BASE = "http://localhost:3000/api";
+import { API_BASE } from "../config/apiBase";
 
 const SERVICE_TYPES = [
   "Oil Change", "Tyre Replacement", "Brake Inspection",
