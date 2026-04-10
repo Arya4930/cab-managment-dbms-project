@@ -18,7 +18,7 @@ router.get("/bootstrap", async (_req, res) => {
     return res.json(data);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Failed to fetch bootstrap data" });
+    return res.status(500).json({ message: error.message || "Failed to load bootstrap data" });
   } finally {
     await closeConnection(conn);
   }
