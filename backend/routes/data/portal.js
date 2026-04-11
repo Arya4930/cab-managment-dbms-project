@@ -1,4 +1,5 @@
 import express from "express";
+import oracledb from "oracledb";
 import getConnection from "../../oracle.js";
 import { portalBookingSelectSql } from "../../db/queries/bookings.js";
 import {
