@@ -8,6 +8,23 @@ export const insertFeedbackSql = `
   )
 `;
 
+export const selectNextFeedbackIdSql = `
+  SELECT NVL(MAX(feedback_id), 0) + 1 AS "next_feedback_id"
+  FROM feedback
+`;
+
+export const insertFeedbackWithIdSql = `
+  INSERT INTO feedback (
+    feedback_id,
+    message,
+    user_id
+  ) VALUES (
+    :feedback_id,
+    :message,
+    :user_id
+  )
+`;
+
 export const feedbackSelectByUserSql = `
   SELECT
     feedback_id AS "feedback_id",
