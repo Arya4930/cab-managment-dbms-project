@@ -127,7 +127,7 @@ export default function DriverDashboard({ currentDriver, onLogout }) {
             </p>
           </div>
           <button className="btn btn--primary" disabled={processing} onClick={() => handleDriverAction(activeRide.booking_id, "complete")}>
-            <CheckCircle2 size={14} /> Complete Ride
+            <CheckCircle2 size={13} /> Complete Ride
           </button>
           <button className="btn btn--ghost" disabled={processing} onClick={() => handleDriverAction(activeRide.booking_id, "cancel")}>
             <Ban size={14} /> Cancel Ride
@@ -154,7 +154,7 @@ export default function DriverDashboard({ currentDriver, onLogout }) {
             <div className="portal-bookingCard__actions">
               {booking.status === "In Progress" && (
                 <button className="btn btn--ghost" disabled={processing} onClick={() => handleDriverAction(booking.booking_id, "complete")}>
-                  <CheckCircle2 size={14} /> Complete Ride
+                  <CheckCircle2 size={13} /> Complete Ride
                 </button>
               )}
               {["Scheduled", "In Progress"].includes(booking.status) && (
