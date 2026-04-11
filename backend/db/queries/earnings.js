@@ -48,6 +48,31 @@ export const insertEarningSql = `
   RETURNING earning_id INTO :earning_id
 `;
 
+export const selectNextEarningIdSql = `
+  SELECT NVL(MAX(earning_id), 0) + 1 AS "next_earning_id"
+  FROM earnings
+`;
+
+export const insertEarningWithIdSql = `
+  INSERT INTO earnings (
+    earning_id,
+    earning_date,
+    driver_amount,
+    booking_id,
+    driver_id,
+    platform_fee,
+    trips
+  ) VALUES (
+    :earning_id,
+    :earning_date,
+    :driver_amount,
+    :booking_id,
+    :driver_id,
+    :platform_fee,
+    :trips
+  )
+`;
+
 export const updateEarningSql = `
   UPDATE earnings
   SET earning_date = :earning_date,

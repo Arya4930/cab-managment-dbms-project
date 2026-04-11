@@ -4,7 +4,6 @@ import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
-// Avoid Express JSON serialization errors for Oracle CLOB/Lob objects.
 oracledb.fetchAsString = [oracledb.CLOB];
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,18 +29,15 @@ function resolveConfigDir() {
         return explicit;
     }
 
-    // Render Secret Files are available from /etc/secrets/<filename>.
     if (hasOracleNetFiles("/etc/secrets")) {
         return "/etc/secrets";
     }
 
-    // Render can also expose secret files at app root.
     const appRoot = process.cwd();
     if (hasOracleNetFiles(appRoot)) {
         return appRoot;
     }
 
-    // Local development fallback.
     const localOracleConfig = path.join(__dirname, "oracle_config");
     if (hasOracleNetFiles(localOracleConfig)) {
         return localOracleConfig;

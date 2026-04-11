@@ -3,7 +3,9 @@ import oracledb from "oracledb";
 import getConnection from "../../oracle.js";
 import { portalBookingSelectSql } from "../../db/queries/bookings.js";
 import {
+  insertEarningWithIdSql,
   insertEarningSql,
+  selectNextEarningIdSql,
   selectEarningByBookingIdSql,
   updateEarningSql,
 } from "../../db/queries/earnings.js";
@@ -177,7 +179,24 @@ async function completeBooking(conn, booking) {
       const retryEarningId = Number(retryRows[0]?.earnings_id ?? retryRows[0]?.earning_id ?? 0);
 
       if (retryEarningId <= 0) {
-        throw insertError;
+        const nextEarningIdRows = await fetchRows(conn, selectNextEarningIdSql);
+        const nextEarningId = Number(nextEarningIdRows[0]?.next_earning_id ?? 0);
+
+        if (!Number.isFinite(nextEarningId) || nextEarningId <= 0) {
+          throw insertError;
+        }
+
+        await conn.execute(insertEarningWithIdSql, {
+          earning_id: nextEarningId,
+          earning_date: new Date(),
+          driver_amount: grossAmount,
+          booking_id: bookingId,
+          driver_id: booking.driver_id,
+          platform_fee: platformFee,
+          trips: Number.isFinite(nextTripCount) && nextTripCount > 0 ? nextTripCount : 1,
+        });
+
+        return;
       }
 
       await conn.execute(updateEarningSql, {
