@@ -18,6 +18,7 @@ import {
   selectPaymentByBookingIdSql,
   updatePortalPaymentSql,
 } from "../../db/queries/payments.js";
+import { insertTrackingSql } from "../../db/queries/tracking.js";
 import {
   insertReviewWithIdSql,
   insertReviewSql,
@@ -39,6 +40,35 @@ async function fetchBooking(conn, bookingId) {
   });
 
   return rows[0] ?? null;
+}
+
+function randomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function buildSimulatedTrackingData() {
+  const latitude = randomNumber(12.88, 13.18).toFixed(4);
+  const longitude = randomNumber(80.14, 80.31).toFixed(4);
+
+  return {
+    driver_location: `${latitude},${longitude}`,
+    speed_kmh: Number(randomNumber(22, 68).toFixed(1)),
+    time_stamp: new Date(),
+    track_status: "En Route",
+  };
+}
+
+async function logStartTracking(conn, bookingId) {
+  const tracking = buildSimulatedTrackingData();
+
+  await conn.execute(insertTrackingSql, {
+    driver_location: tracking.driver_location,
+    time_stamp: tracking.time_stamp,
+    booking_id: String(bookingId).trim().toUpperCase(),
+    speed_kmh: tracking.speed_kmh,
+    track_status: tracking.track_status,
+    tracking_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+  });
 }
 
 async function completeBooking(conn, booking) {
@@ -153,6 +183,7 @@ router.post("/passenger/bookings/:bookingId/start", async (req, res) => {
     });
 
     await conn.execute(updateDriverOnTripSql, { driver_id: booking.driver_id });
+    await logStartTracking(conn, booking.booking_id);
 
     await conn.commit();
     return res.status(200).json({ message: "Ride started" });
@@ -212,6 +243,7 @@ router.post("/driver/bookings/:bookingId/start", async (req, res) => {
     });
 
     await conn.execute(updateDriverOnTripSql, { driver_id: booking.driver_id });
+    await logStartTracking(conn, booking.booking_id);
 
     await conn.commit();
     return res.status(200).json({ message: "Ride started" });
