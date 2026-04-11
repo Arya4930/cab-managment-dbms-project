@@ -18,7 +18,7 @@ import {
   selectPaymentByBookingIdSql,
   updatePortalPaymentSql,
 } from "../../db/queries/payments.js";
-import { insertTrackingSql } from "../../db/queries/tracking.js";
+import { insertTrackingSql, updateTrackingSql } from "../../db/queries/tracking.js";
 import {
   insertReviewWithIdSql,
   insertReviewSql,
@@ -33,6 +33,15 @@ import {
 import { closeConnection, fetchRows, validateRequired } from "./helpers.js";
 
 const router = express.Router();
+
+const selectLatestTrackingByBookingIdSql = `
+  SELECT
+    tracking_id AS "tracking_id"
+  FROM ride_tracking
+  WHERE UPPER(TRIM(booking_id)) = :booking_id
+  ORDER BY time_stamp DESC
+  FETCH FIRST 1 ROWS ONLY
+`;
 
 async function fetchBooking(conn, bookingId) {
   const rows = await fetchRows(conn, portalBookingSelectSql, {
@@ -60,15 +69,56 @@ function buildSimulatedTrackingData() {
 
 async function logStartTracking(conn, bookingId) {
   const tracking = buildSimulatedTrackingData();
-
-  await conn.execute(insertTrackingSql, {
-    driver_location: tracking.driver_location,
-    time_stamp: tracking.time_stamp,
-    booking_id: String(bookingId).trim().toUpperCase(),
-    speed_kmh: tracking.speed_kmh,
-    track_status: tracking.track_status,
-    tracking_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+  const normalizedBookingId = String(bookingId).trim().toUpperCase();
+  const existingRows = await fetchRows(conn, selectLatestTrackingByBookingIdSql, {
+    booking_id: normalizedBookingId,
   });
+  const existingTrackingId = Number(existingRows[0]?.tracking_id ?? 0);
+
+  if (existingTrackingId > 0) {
+    await conn.execute(updateTrackingSql, {
+      tracking_id: existingTrackingId,
+      driver_location: tracking.driver_location,
+      time_stamp: tracking.time_stamp,
+      booking_id: normalizedBookingId,
+      speed_kmh: tracking.speed_kmh,
+      track_status: tracking.track_status,
+    });
+    return;
+  }
+
+  try {
+    await conn.execute(insertTrackingSql, {
+      driver_location: tracking.driver_location,
+      time_stamp: tracking.time_stamp,
+      booking_id: normalizedBookingId,
+      speed_kmh: tracking.speed_kmh,
+      track_status: tracking.track_status,
+      tracking_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+    });
+  } catch (insertError) {
+    if (insertError?.code !== "ORA-00001") {
+      throw insertError;
+    }
+
+    const retryRows = await fetchRows(conn, selectLatestTrackingByBookingIdSql, {
+      booking_id: normalizedBookingId,
+    });
+    const retryTrackingId = Number(retryRows[0]?.tracking_id ?? 0);
+
+    if (retryTrackingId <= 0) {
+      throw insertError;
+    }
+
+    await conn.execute(updateTrackingSql, {
+      tracking_id: retryTrackingId,
+      driver_location: tracking.driver_location,
+      time_stamp: tracking.time_stamp,
+      booking_id: normalizedBookingId,
+      speed_kmh: tracking.speed_kmh,
+      track_status: tracking.track_status,
+    });
+  }
 }
 
 async function completeBooking(conn, booking) {
