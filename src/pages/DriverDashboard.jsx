@@ -135,7 +135,7 @@ export default function DriverDashboard({ currentDriver, onLogout }) {
         </div>
       )}
 
-      <div className="portal-bookingList">
+      <div className="portal-bookingList" style={{ marginBottom: "32px" }}>
         {enrichedBookings.map((booking) => (
           <div key={booking.booking_id} className="portal-bookingCard">
             <div className="portal-bookingCard__head">
