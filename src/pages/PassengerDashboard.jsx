@@ -16,6 +16,13 @@ const statusTypeMap = {
   Cancelled: "error",
 };
 
+const bookingPriority = {
+  Scheduled: 0,
+  "In Progress": 1,
+  Completed: 2,
+  Cancelled: 3,
+};
+
 export default function PassengerDashboard({ currentPassenger, onLogout }) {
   const { data, loading, error, reload } = useBootstrapData();
   const [paymentBookingId, setPaymentBookingId] = useState(null);
@@ -32,11 +39,20 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
     () =>
       (data.bookings ?? [])
         .filter((booking) => Number(booking.user_id) === Number(currentPassenger?.user_id))
-        .sort((a, b) => new Date((b.pickup_time ?? "").replace(" ", "T")) - new Date((a.pickup_time ?? "").replace(" ", "T"))),
+        .sort((a, b) => {
+          const priorityDiff = (bookingPriority[a.status] ?? 99) - (bookingPriority[b.status] ?? 99);
+          if (priorityDiff !== 0) {
+            return priorityDiff;
+          }
+          return new Date((b.pickup_time ?? "").replace(" ", "T")) - new Date((a.pickup_time ?? "").replace(" ", "T"));
+        }),
     [data.bookings, currentPassenger]
   );
 
-  const activeBooking = myBookings.find((booking) => booking.status === "In Progress" || booking.status === "Scheduled") ?? null;
+  const activeBooking =
+    myBookings.find((booking) => booking.status === "In Progress") ??
+    myBookings.find((booking) => booking.status === "Scheduled") ??
+    null;
   const paidBookings = new Set(
     (data.payments ?? [])
       .filter((payment) => payment.status === "Success")

@@ -1729,6 +1729,102 @@ textarea {
     grid-template-columns: 1fr !important;
   }
 
+  .stat-grid {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    padding: 14px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+
+  .stat-card::before {
+    width: 5px;
+  }
+
+  .stat-card__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .stat-card__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .stat-card__value {
+    font-size: 22px;
+  }
+
+  .stat-card__title,
+  .stat-card__subtitle {
+    font-size: 11px;
+  }
+
+  .portal-heroCard {
+    margin-bottom: 14px;
+    padding: 14px 14px 14px 16px;
+    border-radius: 14px;
+    gap: 10px;
+  }
+
+  .portal-heroCard::before {
+    width: 6px;
+  }
+
+  .portal-heroCard h2 {
+    font-size: 22px;
+  }
+
+  .portal-heroCard p {
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  .portal-bookingList {
+    gap: 10px;
+  }
+
+  .portal-bookingCard {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .portal-bookingCard__head {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .portal-bookingCard__title {
+    font-size: 20px;
+  }
+
+  .portal-bookingCard__sub {
+    margin-top: 3px;
+    font-size: 12px;
+  }
+
+  .portal-bookingCard__meta {
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .portal-bookingCard__actions {
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .portal-bookingCard .btn,
+  .portal-heroCard .btn {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+
   .page-header,
   .portal-topbar,
   .portal-heroCard {
@@ -1745,5 +1841,32 @@ textarea {
   .login-panel,
   .portal-loginCard {
     padding: 28px 22px;
+  }
+}
+
+@media (max-width: 520px) {
+  .portal-shell {
+    padding: 16px 12px;
+  }
+
+  .portal-topbar {
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+
+  .portal-topbar__actions {
+    width: 100%;
+  }
+
+  .portal-topbar__actions .btn {
+    width: 100%;
+  }
+
+  .portal-usercard {
+    width: 100%;
+  }
+
+  .portal-title {
+    font-size: 2rem;
   }
 }

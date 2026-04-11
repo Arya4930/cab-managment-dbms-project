@@ -14,6 +14,13 @@ const statusTypeMap = {
   Cancelled: "error",
 };
 
+const bookingPriority = {
+  Scheduled: 0,
+  "In Progress": 1,
+  Completed: 2,
+  Cancelled: 3,
+};
+
 export default function DriverDashboard({ currentDriver, onLogout }) {
   const { data, loading, error, reload } = useBootstrapData();
   const [actionError, setActionError] = useState("");
@@ -23,7 +30,13 @@ export default function DriverDashboard({ currentDriver, onLogout }) {
     () =>
       (data.bookings ?? [])
         .filter((booking) => Number(booking.driver_id) === Number(currentDriver?.driver_id))
-        .sort((a, b) => new Date((b.pickup_time ?? "").replace(" ", "T")) - new Date((a.pickup_time ?? "").replace(" ", "T"))),
+        .sort((a, b) => {
+          const priorityDiff = (bookingPriority[a.status] ?? 99) - (bookingPriority[b.status] ?? 99);
+          if (priorityDiff !== 0) {
+            return priorityDiff;
+          }
+          return new Date((b.pickup_time ?? "").replace(" ", "T")) - new Date((a.pickup_time ?? "").replace(" ", "T"));
+        }),
     [data.bookings, currentDriver]
   );
 
