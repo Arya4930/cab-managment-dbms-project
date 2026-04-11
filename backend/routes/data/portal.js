@@ -5,6 +5,7 @@ import { portalBookingSelectSql } from "../../db/queries/bookings.js";
 import {
   insertEarningSql,
   selectEarningByBookingIdSql,
+  updateEarningSql,
 } from "../../db/queries/earnings.js";
 import {
   updateDriverAvailableSql,
@@ -62,19 +63,53 @@ async function completeBooking(conn, booking) {
   });
 
   const earningRows = await fetchRows(conn, selectEarningByBookingIdSql, { booking_id: bookingId });
+  const existingEarningId = Number(earningRows[0]?.earnings_id ?? earningRows[0]?.earning_id ?? 0);
 
-  if (earningRows.length === 0) {
-    const nextTripCount = Number(booking.trip_count ?? 1);
-
-    await conn.execute(insertEarningSql, {
+  if (existingEarningId > 0) {
+    await conn.execute(updateEarningSql, {
+      earning_id: existingEarningId,
       earning_date: new Date(),
       driver_amount: grossAmount,
       booking_id: bookingId,
       driver_id: booking.driver_id,
       platform_fee: platformFee,
-      trips: Number.isFinite(nextTripCount) && nextTripCount > 0 ? nextTripCount : 1,
-      earning_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+      trips: 1,
     });
+  } else {
+    const nextTripCount = Number(booking.trip_count ?? 1);
+
+    try {
+      await conn.execute(insertEarningSql, {
+        earning_date: new Date(),
+        driver_amount: grossAmount,
+        booking_id: bookingId,
+        driver_id: booking.driver_id,
+        platform_fee: platformFee,
+        trips: Number.isFinite(nextTripCount) && nextTripCount > 0 ? nextTripCount : 1,
+        earning_id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+      });
+    } catch (insertError) {
+      if (insertError?.code !== "ORA-00001") {
+        throw insertError;
+      }
+
+      const retryRows = await fetchRows(conn, selectEarningByBookingIdSql, { booking_id: bookingId });
+      const retryEarningId = Number(retryRows[0]?.earnings_id ?? retryRows[0]?.earning_id ?? 0);
+
+      if (retryEarningId <= 0) {
+        throw insertError;
+      }
+
+      await conn.execute(updateEarningSql, {
+        earning_id: retryEarningId,
+        earning_date: new Date(),
+        driver_amount: grossAmount,
+        booking_id: bookingId,
+        driver_id: booking.driver_id,
+        platform_fee: platformFee,
+        trips: 1,
+      });
+    }
   }
 }
 
