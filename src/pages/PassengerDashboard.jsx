@@ -204,19 +204,6 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
       {error && <p className="page-sub" style={{ color: "var(--accent-amber)", marginBottom: "16px" }}>{error}</p>}
       {actionError && <p className="page-sub" style={{ color: "var(--accent-amber)", marginBottom: "16px" }}>{actionError}</p>}
 
-      <div className="stat-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-        <StatCard title="My Bookings" value={myBookings.length} icon={MapPin} accent="var(--accent-blue)" />
-        <StatCard title="Active Ride" value={activeBooking ? 1 : 0} icon={TimerReset} accent="var(--accent-emerald)" />
-        <StatCard title="Paid Trips" value={paidBookings.size} icon={Wallet} accent="var(--accent-amber)" />
-        <StatCard title="Total Spent" value={`Rs ${totalSpent.toLocaleString()}`} icon={CreditCard} accent="var(--accent-rose)" />
-      </div>
-
-      <div style={{ marginBottom: "18px", display: "flex", justifyContent: "flex-end" }}>
-        <button className="btn btn--ghost" onClick={() => setFeedbackOpen(true)}>
-          <MessageSquare size={14} /> Add Feedback
-        </button>
-      </div>
-
       {activeBooking && (
         <div className="portal-heroCard">
           <div>
@@ -287,6 +274,19 @@ export default function PassengerDashboard({ currentPassenger, onLogout }) {
             </div>
           </div>
         ))}
+      </div>
+
+      <div style={{ marginBottom: "18px", marginTop: "14px", display: "flex", justifyContent: "flex-end" }}>
+        <button className="btn btn--ghost" onClick={() => setFeedbackOpen(true)}>
+          <MessageSquare size={14} /> Add Feedback
+        </button>
+      </div>
+
+      <div className="stat-grid stat-grid--compact-mobile" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+        <StatCard title="My Bookings" value={myBookings.length} icon={MapPin} accent="var(--accent-blue)" />
+        <StatCard title="Active Ride" value={activeBooking ? 1 : 0} icon={TimerReset} accent="var(--accent-emerald)" />
+        <StatCard title="Paid Trips" value={paidBookings.size} icon={Wallet} accent="var(--accent-amber)" />
+        <StatCard title="Total Spent" value={`Rs ${totalSpent.toLocaleString()}`} icon={CreditCard} accent="var(--accent-rose)" />
       </div>
 
       <Modal isOpen={paymentBookingId !== null} onClose={() => setPaymentBookingId(null)} title="Pay For Ride">

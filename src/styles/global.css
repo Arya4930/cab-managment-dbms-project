@@ -1724,43 +1724,43 @@ textarea {
   .charts-row,
   .portal-bookingList,
   .driver-grid,
-  .tracking-grid,
-  .stat-grid {
+  .tracking-grid {
     grid-template-columns: 1fr !important;
   }
 
   .stat-grid {
-    gap: 10px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+    margin-bottom: 14px;
   }
 
-  .stat-card {
+  .stat-grid--compact-mobile .stat-card {
     padding: 14px;
     gap: 8px;
     border-radius: 14px;
   }
 
-  .stat-card::before {
+  .stat-grid--compact-mobile .stat-card::before {
     width: 5px;
   }
 
-  .stat-card__icon {
+  .stat-grid--compact-mobile .stat-card__icon {
     width: 34px;
     height: 34px;
     border-radius: 10px;
   }
 
-  .stat-card__icon svg {
+  .stat-grid--compact-mobile .stat-card__icon svg {
     width: 16px;
     height: 16px;
   }
 
-  .stat-card__value {
-    font-size: 22px;
+  .stat-grid--compact-mobile .stat-card__value {
+    font-size: 20px;
   }
 
-  .stat-card__title,
-  .stat-card__subtitle {
+  .stat-grid--compact-mobile .stat-card__title,
+  .stat-grid--compact-mobile .stat-card__subtitle {
     font-size: 11px;
   }
 
@@ -1849,6 +1849,10 @@ textarea {
     padding: 16px 12px;
   }
 
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
   .portal-topbar {
     margin-bottom: 16px;
     gap: 12px;
@@ -1868,5 +1872,11 @@ textarea {
 
   .portal-title {
     font-size: 2rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .stat-grid {
+    grid-template-columns: 1fr !important;
   }
 }

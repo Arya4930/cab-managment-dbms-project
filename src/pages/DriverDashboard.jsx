@@ -117,20 +117,6 @@ export default function DriverDashboard({ currentDriver, onLogout }) {
       {error && <p className="page-sub" style={{ color: "var(--accent-amber)", marginBottom: "16px" }}>{error}</p>}
       {actionError && <p className="page-sub" style={{ color: "var(--accent-amber)", marginBottom: "16px" }}>{actionError}</p>}
 
-      <div className="stat-grid" style={{ gridTemplateColumns: "repeat(5, 1fr)" }}>
-        <StatCard title="Assigned Rides" value={myBookings.length} icon={BriefcaseBusiness} accent="var(--accent-blue)" />
-        <StatCard title="Scheduled" value={scheduledRides} icon={MapPinned} accent="var(--accent-amber)" />
-        <StatCard title="Current Status" value={currentDriver?.status ?? "Available"} icon={CarFront} accent="var(--accent-emerald)" />
-        <StatCard title="Net Earnings" value={`Rs ${myNet.toLocaleString()}`} icon={Gauge} accent="var(--accent-violet)" />
-        <StatCard
-          title="Avg. Review"
-          value={myReviews.length ? averageReviewRating.toFixed(1) : "N/A"}
-          subtitle={myReviews.length ? `${myReviews.length} passenger reviews` : "No reviews yet"}
-          icon={Star}
-          accent="var(--accent-amber)"
-        />
-      </div>
-
       {activeRide && (
         <div className="portal-heroCard portal-heroCard--driver">
           <div>
@@ -179,6 +165,20 @@ export default function DriverDashboard({ currentDriver, onLogout }) {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="stat-grid stat-grid--compact-mobile" style={{ gridTemplateColumns: "repeat(5, 1fr)" }}>
+        <StatCard title="Assigned Rides" value={myBookings.length} icon={BriefcaseBusiness} accent="var(--accent-blue)" />
+        <StatCard title="Scheduled" value={scheduledRides} icon={MapPinned} accent="var(--accent-amber)" />
+        <StatCard title="Current Status" value={currentDriver?.status ?? "Available"} icon={CarFront} accent="var(--accent-emerald)" />
+        <StatCard title="Net Earnings" value={`Rs ${myNet.toLocaleString()}`} icon={Gauge} accent="var(--accent-violet)" />
+        <StatCard
+          title="Avg. Review"
+          value={myReviews.length ? averageReviewRating.toFixed(1) : "N/A"}
+          subtitle={myReviews.length ? `${myReviews.length} passenger reviews` : "No reviews yet"}
+          icon={Star}
+          accent="var(--accent-amber)"
+        />
       </div>
 
       <div className="section-card portal-reviewSection">
