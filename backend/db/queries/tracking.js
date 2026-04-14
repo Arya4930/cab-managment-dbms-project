@@ -27,6 +27,29 @@ export const insertTrackingSql = `
   RETURNING tracking_id INTO :tracking_id
 `;
 
+export const selectNextTrackingIdSql = `
+  SELECT NVL(MAX(tracking_id), 0) + 1 AS next_tracking_id
+  FROM ride_tracking
+`;
+
+export const insertTrackingWithIdSql = `
+  INSERT INTO ride_tracking (
+    tracking_id,
+    driver_location,
+    time_stamp,
+    booking_id,
+    speed_kmh,
+    track_status
+  ) VALUES (
+    :tracking_id,
+    :driver_location,
+    :time_stamp,
+    :booking_id,
+    :speed_kmh,
+    :track_status
+  )
+`;
+
 export const updateTrackingSql = `
   UPDATE ride_tracking
   SET driver_location = :driver_location,

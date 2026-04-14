@@ -1,5 +1,3 @@
--- Seed data aligned with src/data/mockData.js
-
 INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (1, 'Arjun Mehta', 'arjun@example.com', '123456', '+91-98001-11234', 'Passenger', TO_DATE('2023-01-15', 'YYYY-MM-DD'), 42);
 INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (2, 'Priya Sharma', 'priya@example.com', '123456', '+91-98001-22345', 'Passenger', TO_DATE('2023-03-08', 'YYYY-MM-DD'), 18);
 INSERT INTO users (user_id, name, email, password, phone_number, user_type, joined_date, total_rides) VALUES (3, 'Ravi Kumar', 'ravi@example.com', '123456', '+91-98001-33456', 'Passenger', TO_DATE('2022-11-20', 'YYYY-MM-DD'), 87);

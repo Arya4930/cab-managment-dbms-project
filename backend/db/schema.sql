@@ -1,6 +1,3 @@
--- Run this script in Oracle SQL*Plus / SQL Developer.
--- It recreates schema objects for the Cab Management System.
-
 BEGIN EXECUTE IMMEDIATE 'DROP TABLE refunds CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
 /
 BEGIN EXECUTE IMMEDIATE 'DROP TABLE payment CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;

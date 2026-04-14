@@ -20,7 +20,12 @@ import {
   selectPaymentByBookingIdSql,
   updatePortalPaymentSql,
 } from "../../db/queries/payments.js";
-import { insertTrackingSql, updateTrackingSql } from "../../db/queries/tracking.js";
+import {
+  insertTrackingSql,
+  insertTrackingWithIdSql,
+  selectNextTrackingIdSql,
+  updateTrackingSql,
+} from "../../db/queries/tracking.js";
 import {
   insertReviewWithIdSql,
   insertReviewSql,
@@ -109,7 +114,23 @@ async function logStartTracking(conn, bookingId) {
     const retryTrackingId = Number(retryRows[0]?.tracking_id ?? 0);
 
     if (retryTrackingId <= 0) {
-      throw insertError;
+      const nextTrackingIdRows = await fetchRows(conn, selectNextTrackingIdSql);
+      const nextTrackingId = Number(nextTrackingIdRows[0]?.next_tracking_id ?? 0);
+
+      if (!Number.isFinite(nextTrackingId) || nextTrackingId <= 0) {
+        throw insertError;
+      }
+
+      await conn.execute(insertTrackingWithIdSql, {
+        tracking_id: nextTrackingId,
+        driver_location: tracking.driver_location,
+        time_stamp: tracking.time_stamp,
+        booking_id: normalizedBookingId,
+        speed_kmh: tracking.speed_kmh,
+        track_status: tracking.track_status,
+      });
+
+      return;
     }
 
     await conn.execute(updateTrackingSql, {
